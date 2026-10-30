@@ -45,7 +45,7 @@ export const DEMO_SPECIALISTS: Specialist[] = [
     fitNote: "General OB/GYN", routes: { fax: { number: "(972) 555-0177", verified: true } }, ehr: "athenahealth", partner: true,
   },
   {
-    id: "ortiz", name: "Dr. Elena Ortiz (example)", practice: "Uptown Gyn", specialty: "OB/GYN",
+    id: "ortiz", name: "Dr. Nadia Ortiz (example)", practice: "Uptown Gyn", specialty: "OB/GYN",
     npi: "1000000041", network: "out", soonestDays: 5, soonestLabel: "Nov 4", miles: 3.0, pmosExperience: 2,
     fitNote: "Out of network for this plan", routes: { fax: { number: "(214) 555-0199", verified: false } }, ehr: "Unknown", partner: false,
   },
