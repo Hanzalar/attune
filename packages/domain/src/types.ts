@@ -35,6 +35,8 @@ export interface Specialist {
   /** 0 = general, 1 = some, 2 = sees PMOS patients often. Self-reported by the practice or from our partner list. */
   pmosExperience: 0 | 1 | 2;
   fitNote: string;
+  /** New-patient openings a patient can request up front. Empty means waitlist only. */
+  openSlots: Slot[];
   routes: DeliveryRoutes;
   ehr: string;
   /**
@@ -97,6 +99,8 @@ export interface Referral {
   codes: string[];
   signatures: { ma?: string; physician?: string };
   channel: Channel | null;
+  /** The opening the patient picked before approving; held until the specialist office confirms it. */
+  requestedSlot: Slot | null;
   offeredSlot: Slot | null;
   bookedSlot: Slot | null;
   openRequests: string[];
@@ -110,10 +114,12 @@ export type Command =
   | { type: "chooseSpecialist"; by: Role; at: string; specialistId: string }
   | { type: "toggleShare"; by: Role; at: string; key: ShareKey }
   | { type: "setWaitlist"; by: Role; at: string; on: boolean }
+  | { type: "holdSlot"; by: Role; at: string; slot: Slot }
   | { type: "approveSharing"; by: Role; at: string }
   | { type: "signReferral"; by: Role; at: string; codes: string[]; signer: string }
   | { type: "deliver"; by: Role; at: string; channel: Channel }
   | { type: "offerSlot"; by: Role; at: string; slot: Slot }
+  | { type: "confirmRequestedSlot"; by: Role; at: string }
   | { type: "requestRecords"; by: Role; at: string; note: string }
   | { type: "declineReferral"; by: Role; at: string; note: string }
   | { type: "bookSlot"; by: Role; at: string }

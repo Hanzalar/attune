@@ -11,7 +11,7 @@ export const TIMELINE: { stage: Stage; label: string; who: string; note: string 
   { stage: "awaiting_pcp", label: "You approved sharing", who: "You", note: "You chose the gyno and what gets shared." },
   { stage: "signed", label: "PCP signed off", who: "Your PCP's office", note: "The MA confirmed codes and signed the referral." },
   { stage: "sent", label: "Sent to the OB/GYN", who: "Attune agent", note: "Delivered with a receipt, the way their office receives referrals." },
-  { stage: "offered", label: "Received, slot offered", who: "OB/GYN front desk", note: "Accepted the referral and offered a time." },
+  { stage: "offered", label: "Received by the OB/GYN", who: "OB/GYN front desk", note: "Accepted the referral and confirmed your time, or offered another." },
   { stage: "booked", label: "Visit booked", who: "You", note: "Booked. Your intake summary is already in their inbox." },
   { stage: "visited", label: "Visit done", who: "OB/GYN", note: "The visit happened and the outcome was recorded." },
   { stage: "closed", label: "PCP updated", who: "Attune agent", note: "Outcome sent back to your PCP; tracker plan updated." },
@@ -51,6 +51,7 @@ export function newReferral(init: {
     codes: init.codes ?? [],
     signatures: {},
     channel: null,
+    requestedSlot: null,
     offeredSlot: null,
     bookedSlot: null,
     openRequests: [],
@@ -106,7 +107,14 @@ function transition(r: Referral, cmd: Command): Referral {
     case "chooseSpecialist":
       actor(cmd, "patient");
       need(r.stage === "draft", "The specialist can only change before you approve sharing.");
-      return { ...r, specialistId: cmd.specialistId };
+      // A held time belongs to one office; switching offices releases it.
+      return { ...r, specialistId: cmd.specialistId, requestedSlot: cmd.specialistId === r.specialistId ? r.requestedSlot : null };
+
+    case "holdSlot":
+      actor(cmd, "patient");
+      need(r.stage === "draft", "The time can only change before you approve sharing.");
+      need(r.specialistId !== null, "Pick a specialist first.");
+      return { ...r, requestedSlot: cmd.slot };
 
     case "toggleShare":
       actor(cmd, "patient");
@@ -150,6 +158,13 @@ function transition(r: Referral, cmd: Command): Referral {
       need(r.stage === "sent", "A slot can be offered once the referral has arrived.");
       return { ...r, stage: "offered", offeredSlot: cmd.slot, openRequests: [] };
 
+    case "confirmRequestedSlot":
+      actor(cmd, "specialist_staff");
+      need(r.stage === "sent", "A requested time can be confirmed once the referral has arrived.");
+      need(r.requestedSlot !== null, "The patient didn't request a time. Offer one instead.");
+      // The patient picked this time and approved the request, so confirming it books the visit.
+      return { ...r, stage: "booked", offeredSlot: r.requestedSlot, bookedSlot: r.requestedSlot, openRequests: [] };
+
     case "requestRecords":
       actor(cmd, "specialist_staff");
       need(r.stage === "sent", "Records can be requested while the referral is in your inbox.");
@@ -185,8 +200,8 @@ function transition(r: Referral, cmd: Command): Referral {
         return { ...r, stage: "draft", signatures: {}, consent: { grantedAt: null, revokedAt: cmd.at } };
       }
       need(!["closed", "declined", "withdrawn"].includes(r.stage), "The referral is already finished.");
-      // After sending, records already delivered stay with the office; nothing further is shared.
-      return { ...r, stage: "withdrawn", consent };
+      // After sending, records already delivered stay with the office; nothing further is shared and the held time is released.
+      return { ...r, stage: "withdrawn", consent, requestedSlot: null };
     }
   }
 }
@@ -196,10 +211,12 @@ function summarize(r: Referral, cmd: Command): string {
     case "chooseSpecialist": return "Patient picked a specialist";
     case "toggleShare": return `Patient ${r.share[cmd.key] ? "added" : "removed"} ${cmd.key} from the packet`;
     case "setWaitlist": return cmd.on ? "Patient joined the cancellation waitlist" : "Patient left the cancellation waitlist";
+    case "holdSlot": return `Patient picked ${cmd.slot.label} to request`;
     case "approveSharing": return "Patient approved sharing and sent the request to the PCP";
     case "signReferral": return r.stage === "awaiting_physician" ? `MA ${cmd.signer} signed; physician signature required by plan` : `${cmd.signer} signed the referral`;
     case "deliver": return `Packet delivered by ${cmd.channel === "efax" ? "e-fax" : cmd.channel === "direct" ? "Direct message (360X)" : "FHIR"} with receipt`;
     case "offerSlot": return `Specialist accepted and offered ${cmd.slot.label}`;
+    case "confirmRequestedSlot": return `Specialist confirmed the patient's requested time, ${r.bookedSlot?.label ?? ""}`;
     case "requestRecords": return `Specialist requested more records: ${cmd.note}`;
     case "declineReferral": return `Specialist declined: ${cmd.note}`;
     case "bookSlot": return `Patient booked ${r.bookedSlot?.label ?? "the visit"}`;
@@ -222,7 +239,7 @@ export function nextStep(r: Referral): NextStep {
     case "awaiting_pcp": return { role: "pcp_ma", view: "pcp", label: "PCP office signs off" };
     case "awaiting_physician": return { role: "pcp_physician", view: "pcp", label: "PCP physician co-signs" };
     case "signed": return { role: "agent", view: null, label: "Attune delivers the packet" };
-    case "sent": return { role: "specialist_staff", view: "specialist", label: "Specialist accepts and offers a slot" };
+    case "sent": return { role: "specialist_staff", view: "specialist", label: r.requestedSlot ? "Specialist confirms the requested time" : "Specialist accepts and offers a slot" };
     case "offered": return { role: "patient", view: "patient", label: "Patient books the visit" };
     case "booked": return { role: "specialist_provider", view: "specialist", label: "Specialist records the visit" };
     case "visited": return { role: "agent", view: null, label: "Attune closes the loop with the PCP" };

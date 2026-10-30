@@ -59,6 +59,7 @@ export function toFhirBundle(r: Referral, specialist: Specialist, codeDisplays: 
     performer: [{ identifier: { system: NPI, value: specialist.npi }, display: specialist.name }],
     reasonCode: r.codes.map((code) => ({ coding: [{ system: ICD10, code, display: codeDisplays[code] }] })),
     supportingInfo: [{ reference: `DocumentReference/${r.id}-packet` }],
+    ...(r.requestedSlot ? { occurrenceDateTime: r.requestedSlot.at } : {}),
   };
   const task = {
     resourceType: "Task",

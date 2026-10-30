@@ -4,7 +4,7 @@
  */
 import { newReferral } from "./referral";
 import type { EvidenceInput } from "./evidence";
-import type { Referral, ShareItem, Specialist } from "./types";
+import type { Referral, ShareItem, Slot, Specialist } from "./types";
 
 export const DEMO_PATIENT = {
   ref: "MK-2291",
@@ -28,26 +28,33 @@ export const DEMO_PCP = {
   ],
 };
 
+/** Demo times are Central (DFW). The first Raman opening is the one the walkthrough books. */
+const slot = (label: string, at: string): Slot => ({ label, at });
+export const DEMO_SLOT = slot("Nov 12, 2:40 PM", "2026-11-12T14:40:00-06:00");
+
 export const DEMO_SPECIALISTS: Specialist[] = [
   {
     id: "raman", name: "Dr. Priya Raman (example)", practice: "North Dallas Women's Care", specialty: "OB/GYN",
     npi: "1000000017", network: "in", soonestDays: 13, soonestLabel: "Nov 12", miles: 4.2, pmosExperience: 2,
-    fitNote: "Sees PMOS patients often", routes: { fax: { number: "(214) 555-0112", verified: true } }, ehr: "athenahealth", partner: true,
+    fitNote: "Sees PMOS patients often", routes: { fax: { number: "(214) 555-0112", verified: true } },
+    openSlots: [DEMO_SLOT, slot("Nov 12, 4:00 PM", "2026-11-12T16:00:00-06:00"), slot("Nov 13, 9:20 AM", "2026-11-13T09:20:00-06:00")], ehr: "athenahealth", partner: true,
   },
   {
     id: "cole", name: "Dr. Lauren Cole (example)", practice: "Plano Gyn Associates", specialty: "OB/GYN",
     npi: "1000000025", network: "in", soonestDays: 34, soonestLabel: "Dec 3", miles: 6.8, pmosExperience: 1,
-    fitNote: "Fertility focus", routes: { direct: "intake@direct.planogyn.example" }, ehr: "Epic", partner: false,
+    fitNote: "Fertility focus", routes: { direct: "intake@direct.planogyn.example" },
+    openSlots: [slot("Dec 3, 10:00 AM", "2026-12-03T10:00:00-06:00"), slot("Dec 4, 1:30 PM", "2026-12-04T13:30:00-06:00")], ehr: "Epic", partner: false,
   },
   {
     id: "hill", name: "Dr. Marcus Hill (example)", practice: "Richardson OB/GYN", specialty: "OB/GYN",
     npi: "1000000033", network: "in", soonestDays: null, soonestLabel: "Waitlist", miles: 9.1, pmosExperience: 0,
-    fitNote: "General OB/GYN", routes: { fax: { number: "(972) 555-0177", verified: true } }, ehr: "athenahealth", partner: true,
+    fitNote: "General OB/GYN", routes: { fax: { number: "(972) 555-0177", verified: true } }, openSlots: [], ehr: "athenahealth", partner: true,
   },
   {
     id: "ortiz", name: "Dr. Nadia Ortiz (example)", practice: "Uptown Gyn", specialty: "OB/GYN",
     npi: "1000000041", network: "out", soonestDays: 5, soonestLabel: "Nov 4", miles: 3.0, pmosExperience: 2,
-    fitNote: "Out of network for this plan", routes: { fax: { number: "(214) 555-0199", verified: false } }, ehr: "Unknown", partner: false,
+    fitNote: "Out of network for this plan", routes: { fax: { number: "(214) 555-0199", verified: false } },
+    openSlots: [slot("Nov 4, 11:00 AM", "2026-11-04T11:00:00-06:00")], ehr: "Unknown", partner: false,
   },
 ];
 
@@ -96,8 +103,6 @@ export const DEMO_WAITLIST = [
   { id: "RS-3307", note: "Waiting 19 days" },
   { id: "DL-5521", note: "Waiting 6 days" },
 ];
-
-export const DEMO_SLOT = { label: "Nov 12, 2:40 PM", at: "2026-11-12T14:40:00-06:00" };
 
 export function demoReferral(): Referral {
   return newReferral({

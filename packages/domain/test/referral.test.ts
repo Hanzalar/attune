@@ -8,6 +8,7 @@ import {
   demoReferral,
   dispatch,
   nextStep,
+  toFhirBundle,
   type Command,
   type Referral,
 } from "../src";
@@ -103,5 +104,55 @@ describe("delivery channel", () => {
 
   it("refuses an unverified fax number", () => {
     expect(() => chooseChannel({ routes: { fax: { number: "1", verified: false } } })).toThrow(/verified/);
+  });
+});
+
+describe("held time requested up front", () => {
+  const hold: Command = { type: "holdSlot", by: "patient", at, slot: DEMO_SLOT };
+  const confirm: Command = { type: "confirmRequestedSlot", by: "specialist_staff", at };
+
+  it("books the patient's held time once the office confirms it, without a second patient step", () => {
+    const r = run(demoReferral(), hold, approve, sign, confirm);
+    expect(r.stage).toBe("booked");
+    expect(r.bookedSlot).toEqual(DEMO_SLOT);
+    expect(r.log.map((e) => e.type)).toEqual(["holdSlot", "approveSharing", "signReferral", "deliver", "confirmRequestedSlot"]);
+  });
+
+  it("still waits for the PCP office before the office can confirm", () => {
+    const r = run(demoReferral(), hold, approve);
+    expect(() => apply(r, confirm)).toThrow(/arrived/);
+  });
+
+  it("only specialist staff can confirm, and only when a time was requested", () => {
+    const held = run(demoReferral(), hold, approve, sign);
+    expect(() => apply(held, { ...confirm, by: "patient" })).toThrow(/specialist_staff/);
+    const none = run(demoReferral(), approve, sign);
+    expect(() => apply(none, confirm)).toThrow(/didn't request a time/);
+  });
+
+  it("switching offices releases the held time, and the time locks after approval", () => {
+    const switched = run(demoReferral(), hold, { type: "chooseSpecialist", by: "patient", at, specialistId: "cole" });
+    expect(switched.requestedSlot).toBeNull();
+    const approved = run(demoReferral(), hold, approve);
+    expect(() => apply(approved, { ...hold, slot: { label: "Nov 13, 9:20 AM", at: "2026-11-13T09:20:00-06:00" } })).toThrow(DomainError);
+  });
+
+  it("the office can still offer a different time instead", () => {
+    const other = { label: "Nov 13, 9:20 AM", at: "2026-11-13T09:20:00-06:00" };
+    const r = run(demoReferral(), hold, approve, sign, { type: "offerSlot", by: "specialist_staff", at, slot: other });
+    expect(r.stage).toBe("offered");
+    expect(run(r, { type: "bookSlot", by: "patient", at }).bookedSlot).toEqual(other);
+  });
+
+  it("revoking after sending releases the held time", () => {
+    const r = run(demoReferral(), hold, approve, sign, { type: "revokeConsent", by: "patient", at });
+    expect(r.stage).toBe("withdrawn");
+    expect(r.requestedSlot).toBeNull();
+  });
+
+  it("carries the held time into the FHIR ServiceRequest", () => {
+    const r = run(demoReferral(), hold, approve, sign);
+    const sr = toFhirBundle(r, DEMO_SPECIALISTS[0]!).entry.map((e) => e.resource).find((x) => x.resourceType === "ServiceRequest");
+    expect(sr).toMatchObject({ occurrenceDateTime: DEMO_SLOT.at });
   });
 });
