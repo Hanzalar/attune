@@ -10,7 +10,7 @@ import { DEMO_SPECIALISTS, DomainError, demoReferral, dispatch, type Command, ty
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 export type Action = DistributiveOmit<Command, "at">;
 
-const KEY = "attune.demo.referral.v1";
+const KEY = "attune.demo.referral.v2";
 const channel = typeof BroadcastChannel === "undefined" ? null : new BroadcastChannel("attune-demo");
 const listeners = new Set<() => void>();
 
@@ -73,6 +73,6 @@ export function useReferral(): Referral {
 
 export type View = "patient" | "pcp" | "specialist";
 
-export function viewUrl(view: View | "home"): string {
-  return view === "home" ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}${view}/`;
+export function viewUrl(view: View | "demo" | "guide"): string {
+  return `${import.meta.env.BASE_URL}${view}/`;
 }

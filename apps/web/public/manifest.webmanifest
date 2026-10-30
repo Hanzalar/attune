@@ -5,7 +5,7 @@
   "start_url": "./patient/",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#FBF7FA",
-  "theme_color": "#E5576E",
+  "background_color": "#F3F5F8",
+  "theme_color": "#0B5E8E",
   "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }

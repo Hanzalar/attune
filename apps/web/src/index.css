@@ -1,9 +1,29 @@
+/* Self-hosted IBM Plex (no font CDN, so no patient IP leaves for a typeface). See DESIGN.md. */
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-700.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Values mirror src/design/tokens.ts (text, canvas, focus). */
 :root { color-scheme: light; }
-body { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid #E5576E; outline-offset: 2px; }
+body {
+  font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #101A28;
+  background: #F3F5F8;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid #101A28;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #F2A900;
+}
 .tnum { font-variant-numeric: tabular-nums; }
+.mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
