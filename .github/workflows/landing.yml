@@ -1,0 +1,17 @@
+# The landing page has no build of its own. develop's Pages workflow checks out this branch and copies it over
+# the site root, so a push here asks that workflow to redeploy.
+name: landing
+on:
+  push:
+    branches: [landing]
+
+permissions:
+  actions: write
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh workflow run pages.yml --ref develop -R ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ github.token }}
