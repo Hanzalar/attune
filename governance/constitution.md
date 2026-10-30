@@ -5,11 +5,12 @@ Explicit user instructions and higher-priority platform safety instructions take
 
 ## 1. Where Things Live
 
-- One repository, `https://github.com/Hanzalar/attune`, with three kinds of branches that never merge into each other:
+- One repository, `https://github.com/Hanzalar/attune`, with four kinds of branches that never merge into each other:
   - `business` (orphan): product brief, de-identified discovery notes, competitor landscape, pricing and legal options, ADRs. This is business intent.
   - `meta` (orphan): this constitution, agent adapters, component rules, OpenSpec specs and changes, handoffs, release reports.
+  - `landing` (orphan): the public marketing page, static files only. The Pages build on `develop` overlays it on the site root; it may claim only what the product does today.
   - `develop`, `stage`, `main`: application code only.
-- Open them side by side with worktrees: `git worktree add ../attune-meta meta` and `git worktree add ../attune-business business`.
+- Open them side by side with worktrees: `git worktree add ../attune-meta meta`, `git worktree add ../attune-business business` and `git worktree add ../attune-landing landing`.
 - Do not copy specs or business docs into code branches. Link to them.
 - Treat the business branch as intent and the prototype as reference. Neither is proof that something is ready.
 
