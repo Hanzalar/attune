@@ -1,4 +1,5 @@
-# Hosts the three stakeholder views on GitHub Pages.
+# Hosts the site on GitHub Pages: the landing page from the orphan `landing` branch at the root, and the app views
+# (/demo/, /patient/, /pcp/, /specialist/, /guide/) from this build. A push to `landing` re-runs this workflow.
 # develop deploys a labelled preview today; once the first release passes the promotion gate,
 # switch the trigger to main so the public URL only serves verified builds.
 name: pages
@@ -30,6 +31,19 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
+      - uses: actions/checkout@v4
+        with:
+          ref: landing
+          path: .landing
+      - name: Overlay the landing page on the site root
+        run: |
+          set -euo pipefail
+          dist=apps/web/dist
+          # Fail closed if a landing file would overwrite part of the app build.
+          clash=$(cd .landing && find index.html site -type f | while read -r f; do [ -e "../$dist/$f" ] && echo "$f" || true; done)
+          if [ -n "$clash" ]; then printf 'Landing files collide with the app build:\n%s\n' "$clash"; exit 1; fi
+          cp .landing/index.html "$dist/index.html"
+          cp -R .landing/site "$dist/site"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

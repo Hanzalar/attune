@@ -9,4 +9,5 @@ dist/
 # Planning worktrees opened inside the checkout by CI or by hand
 .meta/
 .business/
+.landing/
 dist-types/
