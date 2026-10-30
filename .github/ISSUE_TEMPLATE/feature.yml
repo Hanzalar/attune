@@ -1,0 +1,21 @@
+name: Feature or change
+description: Propose behavior for the patient, PCP or specialist views
+labels: [change]
+body:
+  - type: dropdown
+    id: view
+    attributes:
+      label: Which stakeholder view?
+      options: [Patient app, PCP admin, Specialist admin, Domain rules, Integration]
+    validations: { required: true }
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem, in the user's words
+      description: Link the discovery note on the business branch. No patient names or health details.
+    validations: { required: true }
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Behavior you want (WHEN ... THEN ...)
+    validations: { required: true }

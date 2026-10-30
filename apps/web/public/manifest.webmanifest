@@ -1,0 +1,11 @@
+{
+  "name": "Attune",
+  "short_name": "Attune",
+  "description": "PMOS tracker and patient-owned referral agent.",
+  "start_url": "./patient/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FBF7FA",
+  "theme_color": "#E5576E",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

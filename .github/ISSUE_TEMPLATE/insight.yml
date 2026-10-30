@@ -1,0 +1,19 @@
+name: Interview insight
+description: Log a discovery finding for the business branch (de-identified)
+labels: [discovery]
+body:
+  - type: input
+    id: role
+    attributes:
+      label: Interviewee role (no names)
+      placeholder: e.g. PCP medical assistant, OB/GYN, patient (diagnosed, 5+ years)
+    validations: { required: true }
+  - type: textarea
+    id: finding
+    attributes:
+      label: What we learned
+    validations: { required: true }
+  - type: textarea
+    id: implication
+    attributes:
+      label: What it changes for the product

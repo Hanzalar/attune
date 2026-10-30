@@ -1,0 +1,21 @@
+{
+  "name": "attune",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Attune: patient-owned PMOS referral agent. Patient app, PCP admin and specialist admin web views over one shared referral record.",
+  "type": "module",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "npm run dev -w @attune/web",
+    "build": "npm run build -w @attune/web",
+    "preview": "npm run preview -w @attune/web",
+    "typecheck": "tsc -b packages/domain apps/web",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3",
+    "vitest": "2.1.8"
+  },
+  "engines": { "node": ">=20" }
+}

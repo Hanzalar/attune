@@ -1,0 +1,9 @@
+{
+  "name": "@attune/domain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Referral business rules: lifecycle, consent, coverage, matching, evidence mapping, FHIR shapes.",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts"
+}
