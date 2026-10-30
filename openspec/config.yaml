@@ -1,0 +1,29 @@
+schema: spec-driven
+context: |
+  This is Attune's planning home: branch meta of https://github.com/Hanzalar/attune.
+  Business intent lives on branch business; code lives on develop -> stage -> main.
+  Read governance/constitution.md and governance/components.json first.
+  The repository is public: specs, scenarios and fixtures use synthetic data only.
+  The clickable prototype is reference material, not an accepted requirement.
+rules:
+  proposal:
+    - Link the de-identified discovery note on the business branch that justifies the change.
+    - Name the affected stakeholder views (patient, PCP admin, specialist admin) and components.
+    - State excluded scope and any regulatory gate (consent, sign-off, kickback, FDA CDS) it touches.
+  specs:
+    - Use SHALL or MUST and at least one WHEN/THEN scenario per requirement.
+    - Name the actor role for every action (patient, pcp_ma, pcp_physician, specialist_staff, specialist_provider, agent).
+  design:
+    - Record the implementation branch, packages touched, and the domain functions that enforce each rule.
+    - Identify verification evidence, including the cross-view loop walk.
+  tasks:
+    - Keep tasks independently verifiable and label the component.
+    - End with a handoff update.
+operations:
+  apply:
+    guidance:
+      - Work on feature/<change-id> from develop; keep the same change ID everywhere.
+      - Update handoff.md when switching agents or ending a session.
+  archive:
+    guidance:
+      - Require completed tasks and recorded evidence. Archiving is separate from merge and deploy.

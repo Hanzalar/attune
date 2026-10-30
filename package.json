@@ -1,0 +1,20 @@
+{
+  "name": "attune-meta",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Planning branch for Attune: constitution, OpenSpec specs and changes, handoffs, release evidence.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "agents:sync": "node scripts/agents-sync.mjs sync",
+    "agents:check": "node scripts/agents-sync.mjs check",
+    "agents:install": "node scripts/agents-sync.mjs install",
+    "spec:validate": "openspec validate --all --strict"
+  },
+  "devDependencies": {
+    "@fission-ai/openspec": "1.14.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

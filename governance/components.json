@@ -1,0 +1,34 @@
+{
+  "repository": "https://github.com/Hanzalar/attune",
+  "planningBranch": "meta",
+  "businessBranch": "business",
+  "integrationBranch": "develop",
+  "stagingBranch": "stage",
+  "releaseBranch": "main",
+  "components": [
+    {
+      "id": "domain",
+      "path": "packages/domain",
+      "description": "Referral business rules: lifecycle, consent, sign-off, coverage, ranking, evidence mapping, FHIR shapes",
+      "instructions": [
+        "Keep it pure: no I/O, no clock reads, no randomness. Callers pass timestamps.",
+        "Every rule change ships with a test that fails without it. Refusals throw DomainError with a message a person can act on.",
+        "rankSpecialists must never read the partner field or any commercial data; the invariance test stays.",
+        "Evidence output names a source per item and never states a diagnosis.",
+        "Demo data in demo.ts is synthetic and labelled (example); never add real names, NPIs or fax numbers."
+      ]
+    },
+    {
+      "id": "web",
+      "path": "apps/web",
+      "description": "Patient app, PCP admin and specialist admin pages over one shared record",
+      "instructions": [
+        "Views read rules from @attune/domain; do not re-implement stages, codes, ranking or evidence in components.",
+        "Go through the store's act(); show the rule's refusal message instead of hiding the control.",
+        "Patient app is mobile-first: no horizontal scroll at 390px, safe-area insets respected, tap targets at least 22px.",
+        "Admin views must stay usable at phone width even though they are designed for desktop.",
+        "Keep files under 400 lines; split by tab or panel."
+      ]
+    }
+  ]
+}

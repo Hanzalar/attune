@@ -1,0 +1,24 @@
+[
+  { "tool": "Universal / Codex / OpenCode / Amp / Factory / Compatible Agents", "path": "AGENTS.md" },
+  { "tool": "Claude Code", "path": "CLAUDE.md" },
+  { "tool": "Gemini CLI", "path": "GEMINI.md" },
+  { "tool": "GitHub Copilot", "path": ".github/copilot-instructions.md" },
+  {
+    "tool": "Cursor",
+    "path": ".cursor/rules/constitution.mdc",
+    "frontmatter": "---\ndescription: Shared agent governance and architecture constitution\nalwaysApply: true\n---\n\n"
+  },
+  { "tool": "Cline", "path": ".clinerules/constitution.md" },
+  {
+    "tool": "Windsurf / Cascade",
+    "path": ".windsurf/rules/constitution.md",
+    "frontmatter": "---\ntrigger: always_on\n---\n\n"
+  },
+  {
+    "tool": "Kiro",
+    "path": ".kiro/steering/constitution.md",
+    "frontmatter": "---\ninclusion: always\n---\n\n"
+  },
+  { "tool": "Amazon Q Developer", "path": ".amazonq/rules/constitution.md" },
+  { "tool": "Roo Code", "path": ".roo/rules/constitution.md" }
+]

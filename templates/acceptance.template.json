@@ -1,0 +1,26 @@
+{
+  "tested_commit": "0123456789abcdef0123456789abcdef01234567",
+  "candidate_version": "1.0.0",
+  "artifact": "release-v1.0.0.tar.gz",
+  "specs_report": "https://github.com/my-org/my-specs/blob/meta/releases/v1.0.0-release-report.md",
+  "checks": {
+    "runtime_build": {
+      "status": "passed",
+      "evidence": "CI Build #412 succeeded with zero warnings. Clean artifact hash sha256:abcd..."
+    },
+    "integration_tests": {
+      "status": "passed",
+      "evidence": "E2E suite passed 48/48 scenarios in 3m 12s on staging cluster."
+    },
+    "clean_install": {
+      "status": "passed",
+      "evidence": "Clean container spin-up and dependency bootstrap verified on Debian 12 and macOS 14."
+    },
+    "recovery": {
+      "status": "passed",
+      "evidence": "Simulated database connection drop; verified automatic retry and graceful reconnection without data corruption."
+    }
+  },
+  "reviewer": "jane-doe (Lead Architect)",
+  "rollback": "Deploy previous tag v0.9.8 via Helm rollback command `helm rollback api-service 411`."
+}
