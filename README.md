@@ -7,9 +7,12 @@ No code lives here. Specs are on [`meta`](https://github.com/Hanzalar/attune/tre
 
 | Doc | What it answers |
 | --- | --- |
-| [product/referral-agent-solution.md](product/referral-agent-solution.md) | What we're building, for whom, and the PCP to OB/GYN loop step by step |
+| [product/prototype-handoff.md](product/prototype-handoff.md) | **Start here for the prototype.** The cancellation-fill experience, its rules, screens and demo scenario |
+| [product/design-concepts/](product/design-concepts/README.md) | The three concept boards from the handoff, and what in them is in or out of scope |
+| [product/referral-agent-solution.md](product/referral-agent-solution.md) | The earlier referral-agent framing: the PCP to OB/GYN loop step by step |
 | [discovery/referral-gap.md](discovery/referral-gap.md) | What interviews showed on each side of the handoff |
 | [research/competitive-landscape.md](research/competitive-landscape.md) | Epic, other EHRs, referral-intake vendors, records networks, standards, PMOS players |
+| [research/prototype-landscape-2026-11.md](research/prototype-landscape-2026-11.md) | How real waitlist-fill products work (batch sizes, holds, texts), B2B2C apps sold through providers, PMOS apps, consent UX |
 | [strategy/integrations.md](strategy/integrations.md) | How records come in and packets go out: fax and 360X now, FHIR later |
 | [strategy/pricing-and-legal.md](strategy/pricing-and-legal.md) | Who pays: three options and the kickback risk |
 | [strategy/risks.md](strategy/risks.md) | What could kill it, and the test that settles each risk |

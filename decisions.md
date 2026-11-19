@@ -2,6 +2,22 @@
 
 One entry per decision. Newest first. Each says what we decided, why, and what would change it.
 
+## ADR-011 · 2026-11-18 · The handoff's look replaces Attune Clinical UI
+- **Decision:** Every surface uses the handoff palette (Orchid Wine, Raspberry, Dusty Rose for large type only, Clay, Blush, Bone, Cream, Forest) with Instrument Serif Italic for voice and Instrument Sans for the interface, both self-hosted. The patient app is editorial; the clinician portals use the same colors, plainer and denser. IBM Plex and the navy palette are retired.
+- **Why:** The [prototype handoff](product/prototype-handoff.md) specifies it. Contrast is checked: Forest on Cream 11:1, Raspberry 6.8:1, Dusty Rose 3.9:1 (so large type only), Clay 2.2:1 (decorative only). Status is never color alone: every status is an icon plus a word.
+- **Revisit if:** clinician testers find the portals hard to scan, or patients read the look as not trustworthy for health data.
+
+## ADR-010 · 2026-11-18 · Show the specialist fee in a ledger; charge nothing
+- **Decision:** The prototype accrues a per-referral fee to the specialist practice (amount and trigger set per practice; default trigger is visit attended) and charges nothing. No field pays a PCP or a patient. Matching code cannot read fee terms; a test enforces it. ADR-004 still governs any real billing.
+- **Why:** The handoff makes the specialist the payer. Our own research says that is the riskiest option: AO 26-15, Tex. Occ. Code 102.001, and none of the provider-distributed apps we found charge the receiving clinician per referral ([prototype-landscape-2026-11.md](research/prototype-landscape-2026-11.md)). A display-only ledger lets us test the story without taking that risk.
+- **Revisit if:** counsel clears a specific specialist-paid structure, or rules it out (then switch the ledger to a flat, uniform, cost-based subscription, option B).
+
+## ADR-009 · 2026-11-18 · Prototype one experience: the cancellation fill
+- **Decision:** The prototype is built around one moment: a specialist's cancellation filled by a patient who is already PCP-qualified, insurance-checked and has her record ready. Both gyno and endo are in scope (the demo uses endo). The patient no longer picks a specialist or a time; she sets waitlist preferences and Attune offers openings. Rotterdam evidence scoring, draft ICD-10 codes and specialist ranking are removed from the product.
+- **Why:** The [prototype handoff](product/prototype-handoff.md). It also removes the two features closest to diagnosis ("2 of 3 Rotterdam domains", drafted codes), which the handoff's non-negotiables rule out. This widens ADR-001 (gyno first) to gyno and endo.
+- **What isn't proven:** No interview yet shows how DFW specialists fill cancellations or how often slots go empty (open question for specialist intake staff). Published fill data says per-offer acceptance is 8–11%, so single-offer tiers will be slow ([prototype-landscape-2026-11.md](research/prototype-landscape-2026-11.md)).
+- **Revisit if:** specialist intake interviews show cancellations aren't a real pain, or that front desks won't post them outside their EHR.
+
 ## ADR-008 · 2026-10-30 · Fold the competitor research into the build
 - **Decision:** v1 sends Direct as a 360X package alongside e-fax; the internal model is HL7 BSeR (ServiceRequest + Task + Consent); records pulls are patient-authorized only ((g)(10), then TEFCA IAS).
 - **Why:** Epic and athena can consume 360X without custom work, BSeR keeps v2 and v3 a transport change, and treatment-purpose aggregators are in active litigation with Epic. See [competitive-landscape.md](research/competitive-landscape.md).
