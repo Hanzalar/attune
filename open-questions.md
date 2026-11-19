@@ -13,6 +13,7 @@ Most of the model rests on one PCP practice, one MA, one specialist MA and a han
 - [ ] Quiet hours: should new holds wait between 9 PM and 7 AM her time? Offers sent at night expire unseen.
 - [ ] Equity: patients 65+ and non-English speakers accept fewer offers. Do we need longer holds or translated texts before a pilot?
 - [ ] Navigation: Home plus two header icons (Record, Care team), or a small tab bar? (Open item from the handoff, for design.)
+- [ ] "Muse" was named as an assistant to support. Which product is it, and does it support MCP connectors?
 - [ ] Midi Health added a PMOS pathway (Aug 2026). Fallback destination, like Allara, or a competitor for the gyn visit?
 
 ## For PCP MAs and office managers
@@ -36,6 +37,9 @@ Most of the model rests on one PCP practice, one MA, one specialist MA and a han
 - [ ] When you refer a PMOS patient to an endo or REI, what do you send and what comes back?
 
 ## For patients
+- [ ] Would you journal in a few words a day if an AI turned it into your check-in and record updates you approve? (ADR-012)
+- [ ] Which AI assistant do you already use (Claude, ChatGPT, another)? Would you connect it to your health record, and which parts would you keep back?
+- [ ] What would you ask about your own labs and visits, and what answer would feel like too much?
 - [ ] Would you let an app pull your portal records and labs to build a referral? What would stop you?
 - [ ] Did you ever skip or lose a referral? Why (insurance, wait, no call back)?
 - [ ] Would you pay for an agent that gets you seen sooner? How much, once or monthly?

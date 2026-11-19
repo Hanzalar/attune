@@ -2,6 +2,12 @@
 
 One entry per decision. Newest first. Each says what we decided, why, and what would change it.
 
+## ADR-012 · 2026-11-18 · AI-native journal: assistants draft, she approves
+- **Decision:** Attune connects to AI assistants (Claude in the app and through a connector; ChatGPT and any other MCP client through the connector). She journals in plain words; the assistant drafts record updates she applies with one tap; she asks about her record and gets answers drawn only from what she shared. Each assistant is a consent recipient: per-section grants, every read logged, disconnect ends access. Health data reaches a model only through a gateway we host, on the Messages API.
+- **Why:** The product owner asked for it (2026-11-18). It extends "she stops retelling her story": the record keeps itself current from what she already says. Per-section consent and drafts keep the patient-owned and "drafts, people approve" rules intact.
+- **Risks:** No interview evidence yet that patients want this (open question). An assistant answering about labs sits close to clinical decision support: answers stay display-only (value, date, lab range, source) and send meaning to her care team. Real data needs a BAA with each model provider, and ADR-007 still blocks real PHI. Anthropic's hosted Managed Agents isn't BAA-eligible, so the gateway uses the Messages API.
+- **Revisit if:** patients don't journal or don't trust it, counsel or the FDA CDS check objects to Q&A about results, or a provider's BAA terms rule it out.
+
 ## ADR-011 · 2026-11-18 · The handoff's look replaces Attune Clinical UI
 - **Decision:** Every surface uses the handoff palette (Orchid Wine, Raspberry, Dusty Rose for large type only, Clay, Blush, Bone, Cream, Forest) with Instrument Serif Italic for voice and Instrument Sans for the interface, both self-hosted. The patient app is editorial; the clinician portals use the same colors, plainer and denser. IBM Plex and the navy palette are retired.
 - **Why:** The [prototype handoff](product/prototype-handoff.md) specifies it. Contrast is checked: Forest on Cream 11:1, Raspberry 6.8:1, Dusty Rose 3.9:1 (so large type only), Clay 2.2:1 (decorative only). Status is never color alone: every status is an icon plus a word.
