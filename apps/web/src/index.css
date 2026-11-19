@@ -1,29 +1,63 @@
-/* Self-hosted IBM Plex (no font CDN, so no patient IP leaves for a typeface). See DESIGN.md. */
-@import "@fontsource/ibm-plex-sans/latin-400.css";
-@import "@fontsource/ibm-plex-sans/latin-500.css";
-@import "@fontsource/ibm-plex-sans/latin-600.css";
-@import "@fontsource/ibm-plex-sans/latin-700.css";
-@import "@fontsource/ibm-plex-mono/latin-400.css";
-@import "@fontsource/ibm-plex-mono/latin-500.css";
+/* Self-hosted Instrument Sans and Instrument Serif (SIL OFL). No font CDN sees a patient's IP. See DESIGN.md. */
+@import "@fontsource/instrument-sans/latin-400.css";
+@import "@fontsource/instrument-sans/latin-500.css";
+@import "@fontsource/instrument-sans/latin-600.css";
+@import "@fontsource/instrument-sans/latin-700.css";
+@import "@fontsource/instrument-serif/latin-400.css";
+@import "@fontsource/instrument-serif/latin-400-italic.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Values mirror src/design/tokens.ts (text, canvas, focus). */
+/* Values mirror src/design/tokens.ts. */
 :root { color-scheme: light; }
 body {
-  font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: #101A28;
-  background: #F3F5F8;
+  margin: 0;
+  font-family: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #2E3A2A;
+  background: #F4EBE4;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid #101A28;
+  outline: 2px solid #2E3A2A;
   outline-offset: 2px;
-  box-shadow: 0 0 0 5px #F2A900;
+  box-shadow: 0 0 0 5px #F0C9C8;
 }
 .tnum { font-variant-numeric: tabular-nums; }
-.mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+.voice { font-family: "Instrument Serif", serif; font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+
+/* Grain: fine noise over blooms and paper, drawn in code. */
+.grain { position: relative; isolation: isolate; }
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .55;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .08  0 0 0 0 .16  0 0 0 .16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.grain > * { position: relative; z-index: 1; }
+
+/* Paper: cream stock with faint fibers. The torn edge is a clip-path set inline by <Paper>. */
+.paper {
+  background-color: #FAF4EE;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(194, 160, 139, .07) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(194, 160, 139, .05) 0 1px, transparent 1px 7px);
+}
+
+@keyframes attune-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.rise { animation: attune-rise .28s ease-out both; }
+
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .grain::after { display: none; }
+}
+.print-only { display: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

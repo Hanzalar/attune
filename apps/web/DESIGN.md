@@ -1,102 +1,100 @@
-# Attune Clinical UI
+# Attune design system
 
-Attune's own design system for the patient app, PCP admin, specialist admin, the walkthrough and the landing page.
-Tokens live in [`src/design/tokens.ts`](src/design/tokens.ts); components live in [`src/shared/ui.tsx`](src/shared/ui.tsx).
-Every view uses them. Do not add raw colors, fonts or radii in a view.
+Attune's own design system for the patient app, the PCP portal, the specialist portal, ops and the demo hub.
+Tokens live in [`src/design/tokens.ts`](src/design/tokens.ts); components live in [`src/shared/ui.tsx`](src/shared/ui.tsx)
+and [`src/shared/Brand.tsx`](src/shared/Brand.tsx). Every view uses them. Do not add raw colors, fonts or radii in a view.
+Source: the prototype handoff and its concept boards on `business` (`product/prototype-handoff.md`, ADR-011).
 
 ## What it should feel like
 
-Clinical software people trust at a glance: calm, precise, dense where staff work all day, and generous where
-patients read on a phone. One visual system across all three views, so a referral looks the same to the patient,
-the MA and the front desk.
+**Ethereal editorial, feminine, never bubbly.** The patient app reads like a quiet magazine page made for her: a
+serif-italic voice, soft blooms of wine and blush, cream paper with a torn edge, and one clear Forest button. It is
+finite: Home ends with "You're caught up." The clinician portals use the same colors, plainer and denser, because the
+MA and the front desk work in them all day.
 
 ## Principles
 
-1. **Read first, decorate never.** Every screen answers "what is this, what state is it in, what do I do next" in
-   that order. One primary action per screen.
-2. **Color is never the only signal.** About 8% of men have color-vision deficiency. Every status pairs a color with
-   an icon and a word (`StatusPill`). Charts are distinguishable in grayscale. (NHS colour guidance; NIST GCR 15-996.)
-3. **One limited palette.** One brand blue, three status hues (success, warning, danger), cool neutrals. No second
-   palette for any one view. Switching color systems inside one app is an EHR usability failure.
-4. **Contrast at WCAG AA or better.** Body text at least 4.5:1, large text, icons and input borders at least 3:1. Focus is a
-   2px ink ring with an amber halo, visible on white and on navy.
-5. **Show the next step and its owner.** Like a good booking flow: one decision per step, a visible progress bar,
-   immediate feedback on every tap, and the "in network" answer on the card, not behind a click.
-6. **Identifiers are monospace.** Codes, NPIs, fax numbers, reference IDs and times use Plex Mono with tabular
-   figures so 0/O and 1/l/I never get confused.
-
-## Typography
-
-| Role | Face | Size / line height | Weight |
-| --- | --- | --- | --- |
-| Display (landing only) | IBM Plex Sans | 38 / 1.15 | 600 |
-| Page title | IBM Plex Sans | 24 / 1.25 (patient), 20 / 1.3 (clinical) | 600 |
-| Section title | IBM Plex Sans | 18 / 1.35 | 600 |
-| Body, patient | IBM Plex Sans | 16 / 1.5 | 400 |
-| Body, clinical | IBM Plex Sans | 14 / 1.45 | 400 |
-| Label, overline | IBM Plex Sans | 12 / 1.3, +0.04em, uppercase | 600 |
-| Data, identifiers | IBM Plex Mono | 13 to 14, tabular | 500 |
-
-IBM Plex is open source (SIL OFL), was drawn for interfaces, has tabular figures and distinct I, l and 1. It is
-**self-hosted** from `@fontsource`, so no page sends a patient's IP address to a font CDN.
-Patient reading text never goes below 16px; clinical tables never below 13px.
+1. **One thing per screen.** Each patient screen answers "what is this, what state is it in, what do I do next", with
+   one primary action.
+2. **The voice speaks, the interface instructs.** Instrument Serif Italic is for titles and short human lines ("take
+   your time."). Anything she must read to act is set in Instrument Sans.
+3. **Acknowledge, never advise.** Asides in her ink say what happened ("9 days in a row."). They never interpret a
+   symptom, name a condition or suggest a treatment.
+4. **Color is never the only signal.** Every status is an icon plus a word (`StatusPill`). Chips show a check when
+   selected. Trend lines differ in lightness, not only hue.
+5. **Calm by design.** No red dots, no badges, no infinite scroll, no tab bar. Navigation is Home plus two header icons
+   (Record, Care team). The designer still has to confirm whether a small tab bar is allowed.
+6. **The gone state is a real screen.** Most offers are opened after the slot is taken (research on `business`). "That
+   slot just filled. You're still on the list." gets the same care as the offer.
 
 ## Color
 
-| Token | Hex | Use |
+| Token | Hex | Use | On Cream |
+| --- | --- | --- | --- |
+| `wine` (Orchid Wine) | #5A1428 | Header blooms, issue ink, the mark | 12.3:1 |
+| `raspberry` | #8E3853 | Overlines, links, asides in her ink | 6.8:1 |
+| `dustyRose` | #AE6679 | **Large type only** (24px+) and borders | 3.9:1 |
+| `clay` | #C2A08B | Decorative washes and lines. **Never text.** | 2.2:1 |
+| `blush` | #F0C9C8 | Soft fills, overlines on wine, focus halo, issue background | — |
+| `bone` | #F4EBE4 | App canvas | — |
+| `cream` | #FAF4EE | Paper, panels, text on wine and forest | — |
+| `forest` | #2E3A2A | Body text, primary buttons | 11.0:1 |
+| `inkMuted` | #5B6355 | Secondary text (derived) | 5.7:1 |
+| `line` | #8F7E72 | Input and control borders (derived) | 3.6:1 |
+| `hairline` | #E2D5CA | Decorative dividers only (derived) | — |
+| `sage` / `sand` + `sandInk` | #E3E8DC / #EFE2D6 + #6E4E36 | Done / attention backgrounds (derived) | 5.9:1 |
+
+Status tones: `done` (sage, check), `progress` (cream, dot), `attention` (sand, clock), `issue` (blush with wine ink,
+triangle), `neutral` (bone, circle). Focus is a 2px Forest outline with a Blush halo, visible on cream and on wine.
+
+## Typography
+
+| Role | Face | Size / line height |
 | --- | --- | --- |
-| `canvas` | #F3F5F8 | App background |
-| `surface` | #FFFFFF | Cards, panels, tables |
-| `sunken` | #EEF1F5 | Wells, read-only fields, code chips |
-| `border` / `borderStrong` | #D3DAE3 / #7D8A9A | Dividers / input outlines (3.5:1 on white) |
-| `text` / `textMuted` / `textSubtle` | #101A28 / #4A5869 / #5C6875 | Primary, secondary, tertiary text |
-| `brand` / `brandHover` / `brandSoft` | #0B5E8E / #084A70 / #E6F0F7 | Primary actions, links, selection |
-| `navy` | #0F2338 | Clinical header bar, landing hero |
-| `success` + `successSoft` | #17714A / #E4F3EB | Done, signed, in network, booked |
-| `warning` + `warningSoft` | #8A5A00 / #FFF3D6 | Waiting, needs review, lab gap |
-| `danger` + `dangerSoft` | #B3261E / #FCE9E7 | Declined, withdrawn, out of network, errors |
-| `focus` | #F2A900 | Outer halo of the focus ring; the inner 2px ring is `text`, so focus is 17:1 on light and 8:1 on navy |
+| Display (demo hub) | Instrument Serif Italic | 54 / 1.05 |
+| Screen title (patient) | Instrument Serif Italic | 42 / 1.05 |
+| Page title (clinician) | Instrument Serif Italic | 30 / 1.05 |
+| Aside, in her ink | Instrument Serif Italic, Raspberry | 22 / 1.2 |
+| Overline | Instrument Sans 600, +0.16em, uppercase | 14 |
+| Body, patient | Instrument Sans 400 | 16 / 1.5 |
+| Body, clinician | Instrument Sans 400 | 14 / 1.45 |
+| Dense table (clinician only) | Instrument Sans 600 | 12, uppercase headers |
 
-## Shape and space
+Both faces are SIL OFL and **self-hosted** through `@fontsource`, so no page sends a patient's IP address to a font
+CDN. Patient text never goes below 14px. Identifiers and times use tabular figures (`.tnum`).
 
-- Radius: 4 (chips, inputs), 6 (buttons, cards), 10 (sheets and modals). No pill-shaped cards.
-- Spacing on a 4px grid. Patient screens use 16px gutters and 12px between cards; clinical screens 16px panel padding.
-- Borders separate; shadows only lift overlays (`ELEVATION.overlay`). Cards get a 1px border, not a shadow.
-- Tap targets: 44px minimum on patient screens, 32px on clinical desktop controls.
+## Surfaces and texture
+
+- **Bloom** (`<Bloom variant="wine" | "soft">`): florals drawn in code, layered radial gradients under fine SVG grain.
+  They stand in for photography. `wine` is the title band on patient sub-screens and the demo hub; `soft` sits at the
+  foot of a page.
+- **Paper** (`<Paper>`): cream stock with faint fibers and a deterministic torn bottom edge, lifted by a soft shadow.
+  The patient app's main container: notes, offers, the booked card.
+- **Panel** (`<Panel>`): the clinician container. Cream, 1px hairline border, 10px radius, titled header row.
+- Radius: 6 (buttons, chips, inputs), 10 (panels), 16 (sheets). Spacing on a 4px grid. Tap targets 44px on patient
+  screens, 32px on clinician desktop controls.
 
 ## Components
 
 | Component | Rule |
 | --- | --- |
-| `Button` | `primary` (brand fill), `secondary` (outline), `quiet` (text), `danger`. One primary per screen. Disabled buttons say why nearby. |
-| `StatusPill` | Icon + word + tone. Tones: `neutral`, `info`, `success`, `warning`, `danger`. |
-| `Panel` | Clinical container with a titled header row and optional right-side meta. |
-| `Card` | Patient container: white, 1px border, 6px radius. |
-| `Stepper` | Numbered steps with the current one named. Used for the booking flow. |
-| `SlotButton` | A bookable time. Shows day and time on two lines; selected state is brand fill plus a check icon. |
-| `ProviderCard` | Name, practice, in-network pill, distance, next openings as `SlotButton`s, PMOS experience. Never shows commercial status. |
-| `Notice` | Inline banner for context or rules (info, warning, danger), with an icon. |
-| `Metric` | Label, monospace value with unit, and a status line with icon. |
-| `Toast` | Bottom-center confirmation of the last action; errors stay longer and say how to fix it. |
-
-## Patterns
-
-- **Booking (patient):** Choose doctor and time, choose what to share, review and send, then track. The progress bar
-  stays visible. The held time shows on every later screen until the office confirms it.
-- **Work queue (PCP, specialist):** Left list with status pills, right detail. The detail ends in one decision row.
-  Rule refusals show as a toast with the rule's own message, never a silently hidden button.
-- **Evidence:** Every item names its source in a `Chip`. Patient-logged data is labelled as such.
+| `Button` | `primary` (Forest fill), `secondary` (outline), `quiet` (Raspberry text), `onDark`. One primary per screen. |
+| `StatusPill` | Icon + word + tone. Labels come from `REFERRAL_STATUS`, `SLOT_STATUS`, `OFFER_STATUS` in the domain. |
+| `Overline`, `Voice`, `Ink` | Spaced caps, serif-italic titles, serif-italic asides. |
+| `Chip` | Toggle chip; selected is Forest with a check. |
+| `Dots` | Five open circles for a check-in scale, labelled at both ends. |
+| `Toggle` | Switch with a label and a plain consequence ("Turning this off stops future sharing"). |
+| `Countdown` | Hold time as digits (the signal) and a bar (the echo). |
+| `Notice` | Inline context or rule, with an icon. |
+| `PatientPack` | The one-page Pack. Every item names its source; unshared sections say "Not shared with this office". |
+| `Trends` | Patient-logged check-ins as small lines with averages. No flags, scores or interpretation. |
+| `useToast` / `useAct` | Run a command; a refusal shows the rule's own words. |
 
 ## Do not
 
-- Use serif display faces, coral or cream backgrounds, gradients, glassmorphism or emoji.
-- Encode state with color alone, or put meaning in placeholder text.
-- Rank, badge or highlight a specialist by commercial relationship.
-- Show diagnosis-style labels to patients ("your type", "you have"). Show what was tracked and where it came from.
-
-## Sources
-
-- NIST GCR 15-996, *Technical Basis for User Interface Design of Health IT* (Wiklund et al., 2015).
-- NHS digital service manual, colour: do not rely on colour alone.
-- Healthcare IT News, "5 dos and don'ts of EHR interface design": limited palette, consistency across screens.
-- Pratt IxD critique of Zocdoc (2024): step-by-step constraints, in-network signal on the card, immediate slot feedback.
+- Use Clay or Dusty Rose for small text, or any color as the only signal.
+- Put health details in anything that leaves the app (push, SMS, email, calendar files).
+- Show a diagnosis-style label, a severity score or a suggestion to her ("you have", "probably", "try").
+- Show a practice a waiting patient, the queue, or anything about her before she accepts.
+- Add photography, stock imagery, emoji, glassmorphism or bubbly rounded cards.
+- Load fonts or scripts from a third-party host.

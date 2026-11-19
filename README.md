@@ -1,18 +1,23 @@
 # Attune
 
-A patient-owned referral agent for PMOS (formerly PCOS). It turns a patient's tracker data, portal records and labs into a referral packet, finds an in-network OB/GYN with open slots, gets the PCP office's sign-off, sends the packet the way each office already works, and follows up until the visit happens.
+A patient-owned PMOS record that her PCP, gyno and endo all see, so she stops retelling her story. The prototype is built
+around one moment: **a specialist's cancellation gets filled by a patient who is already ready**, meaning PCP-signed,
+complete for the practice's criteria, insurance-checked, and with her record on one page.
 
 **Site (preview from `develop`):** https://hanzalar.github.io/attune/ serves the landing page from the orphan `landing` branch; the app lives under it.
 
 | Page | Who uses it | URL |
 | --- | --- | --- |
-| Demo hub | Whoever presents the demo | [/attune/demo/](https://hanzalar.github.io/attune/demo/) |
-| Patient app | The patient, on her phone (installable web app today) | [/attune/patient/](https://hanzalar.github.io/attune/patient/) |
-| PCP admin | PCP medical assistant and physician | [/attune/pcp/](https://hanzalar.github.io/attune/pcp/) |
-| Specialist admin | OB/GYN front desk and provider | [/attune/specialist/](https://hanzalar.github.io/attune/specialist/) |
-| Patient walkthrough | Patients in a demo session | [/attune/guide/](https://hanzalar.github.io/attune/guide/) |
+| Demo hub | Whoever presents the demo: the six-step scenario as a live checklist, demo clock, reset | [/attune/demo/](https://hanzalar.github.io/attune/demo/) |
+| Patient app | The patient, on her phone (installable web app) | [/attune/patient/](https://hanzalar.github.io/attune/patient/) |
+| PCP portal | The PCP's medical assistant, and the physician who signs | [/attune/pcp/](https://hanzalar.github.io/attune/pcp/) |
+| Specialist portal | Gyno or endo front desk, and the specialist | [/attune/specialist/](https://hanzalar.github.io/attune/specialist/) |
+| Ops | Attune's back office (mocked): insurance checks, waitlist, directory, notifications, fee ledger, audit log | [/attune/ops/](https://hanzalar.github.io/attune/ops/) |
 
-Open the three views in separate tabs and walk the loop: book a doctor and time on the patient app, sign in PCP admin, confirm the time in specialist admin. They share one record and update live. All people and practices are synthetic.
+Start at the demo hub. Open the views in separate windows (the patient app at phone width) and walk the scenario:
+the endo office posts a cancellation, Ari accepts the offer, the front desk opens her Patient Pack, the endo sends a
+visit summary, and the ledger shows one fee owed by the endo practice. Nothing is billed. All views share one record
+in the browser and update live. All people, practices and plans are synthetic.
 
 > **Planning does not live on this branch.** Business context is on the [`business`](https://github.com/Hanzalar/attune/tree/business) branch; specs, the agent constitution, handoffs and release evidence are on [`meta`](https://github.com/Hanzalar/attune/tree/meta). Read both before changing code.
 
@@ -32,10 +37,11 @@ The orphan branches share no history with code, so nothing merges across them by
 ## Layout
 
 ```
-packages/domain   Business rules: referral lifecycle, consent, sign-off, coverage, ranking,
-                  Rotterdam evidence mapping, draft ICD-10 codes, FHIR (BSeR) shapes. Pure TS, unit tested.
-apps/web          Vite + React. One build: /demo/, /patient/, /pcp/, /specialist/, /guide/.
-                  Design system: apps/web/DESIGN.md (Attune Clinical UI), tokens in src/design/tokens.ts.
+packages/domain   The shared record: referral lifecycle, criteria completeness, waitlist matching, offers and hold
+                  timers, consent and record views, notifications, fee ledger, FHIR (BSeR) shapes. Pure TS, tested.
+                  Fill policy (hold windows, batch sizes) and the product name live in src/config.ts.
+apps/web          Vite + React. One build: /demo/, /patient/, /pcp/, /specialist/, /ops/.
+                  Design system: apps/web/DESIGN.md, tokens in src/design/tokens.ts.
 scripts           check_promotion.py: fail-closed gate for PRs into stage and main.
 release           acceptance.json lands here when a build is promoted.
 ```
@@ -46,7 +52,7 @@ Agent instructions (`AGENTS.md`, `CLAUDE.md`, Copilot, Cursor and others) are ge
 
 ```bash
 npm ci
-npm run dev        # http://localhost:5173/demo/  (also /patient/, /pcp/, /specialist/, /guide/)
+npm run dev        # http://localhost:5173/demo/  (also /patient/, /pcp/, /specialist/, /ops/)
 npm run check      # typecheck, unit tests, production build
 ```
 

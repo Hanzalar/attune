@@ -1,210 +1,307 @@
-import { useCallback, useRef, useState, type ReactNode } from "react";
-import { AlertTriangle, Check, CheckCircle2, CircleAlert, Info, XCircle, type LucideIcon } from "lucide-react";
-import { ELEVATION, FONT, RADIUS, SIZE, T } from "../design/tokens";
+/**
+ * Attune's shared kit. Every surface builds from these, so the patient app, the PCP portal and the specialist portal
+ * read as one product: the patient side generous and editorial, the clinician side plainer and denser.
+ */
+import { useCallback, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Check, Circle, CircleDot, Clock, Info, TriangleAlert, X } from "lucide-react";
+import type { Command, Tone } from "@attune/domain";
+import { FONT, RADIUS, SHADOW, SIZE, T, TONE } from "../design/tokens";
+import { act } from "./store";
 
-/** Components of Attune Clinical UI. Rules for each live in apps/web/DESIGN.md. */
+export const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(" ");
 
-export function Eyebrow({ children, color = T.textMuted }: { children: ReactNode; color?: string }) {
-  return <div className="uppercase" style={{ color, fontSize: SIZE.xs, fontWeight: 600, letterSpacing: "0.04em" }}>{children}</div>;
+/** Spaced capitals, Raspberry on light, Blush on Orchid Wine. */
+export function Overline({ children, onDark, style }: { children: ReactNode; onDark?: boolean; style?: CSSProperties }) {
+  return (
+    <p style={{ fontSize: SIZE.sm, letterSpacing: "0.16em", textTransform: "uppercase", fontWeight: 600, color: onDark ? T.blush : T.raspberry, margin: 0, ...style }}>
+      {children}
+    </p>
+  );
 }
 
-export function Label({ children, mt = 0 }: { children: ReactNode; mt?: number }) {
-  return <div className="uppercase" style={{ fontSize: SIZE.xs, color: T.textMuted, letterSpacing: "0.04em", fontWeight: 600, marginTop: mt }}>{children}</div>;
+/** The voice: Instrument Serif Italic. Used for titles and short human lines, never for instructions. */
+export function Voice({ as: Tag = "h1", size = SIZE.xxl, color = T.forest, children, style }: { as?: "h1" | "h2" | "h3" | "p" | "span"; size?: number; color?: string; children: ReactNode; style?: CSSProperties }) {
+  return (
+    <Tag className="voice" style={{ fontSize: size, lineHeight: 1.05, color, margin: 0, ...style }}>
+      {children}
+    </Tag>
+  );
 }
 
-type Tone = "plain" | "good" | "warn" | "flag" | "blue";
-const TONES: Record<Tone, [bg: string, fg: string]> = {
-  plain: [T.sunken, T.textMuted], good: [T.successSoft, T.success], warn: [T.warningSoft, T.warning],
-  flag: [T.dangerSoft, T.danger], blue: [T.brandSoft, T.brandInk],
+/** A small aside in her ink: Raspberry serif italic. Encouragement and acknowledgement, never advice. */
+export function Ink({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+  return (
+    <p className="voice" style={{ fontSize: SIZE.lg, lineHeight: 1.2, color: T.raspberry, margin: 0, ...style }}>
+      {children}
+    </p>
+  );
+}
+
+type ButtonVariant = "primary" | "secondary" | "quiet" | "onDark";
+const BUTTON: Record<ButtonVariant, CSSProperties> = {
+  primary: { background: T.forest, color: T.cream, border: `1px solid ${T.forest}` },
+  secondary: { background: "transparent", color: T.forest, border: `1px solid ${T.forest}` },
+  quiet: { background: "transparent", color: T.raspberry, border: "1px solid transparent", textDecoration: "underline", textUnderlineOffset: 3 },
+  onDark: { background: T.cream, color: T.wine, border: `1px solid ${T.cream}` },
 };
 
-/** Small tag for sources, codes and counts. Statuses use StatusPill, which always carries an icon. */
-export function Chip({ children, tone = "plain" }: { children: ReactNode; tone?: Tone }) {
-  const [bg, fg] = TONES[tone];
+export function Button({
+  children, onClick, variant = "primary", size = "lg", full, icon, disabled, type = "button", style, ariaLabel,
+}: {
+  children: ReactNode; onClick?: () => void; variant?: ButtonVariant; size?: "lg" | "md" | "sm"; full?: boolean; icon?: ReactNode;
+  disabled?: boolean; type?: "button" | "submit"; style?: CSSProperties; ariaLabel?: string;
+}) {
+  const pad = size === "lg" ? "15px 22px" : size === "md" ? "10px 16px" : "6px 12px";
+  const minHeight = size === "lg" ? 54 : size === "md" ? 44 : 32;
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5" style={{ background: bg, color: fg, fontSize: SIZE.xs, fontWeight: 600, borderRadius: RADIUS.sm, whiteSpace: "nowrap" }}>
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={ariaLabel}
+      className="inline-flex items-center justify-center gap-2"
+      style={{
+        ...BUTTON[variant], padding: pad, minHeight, borderRadius: RADIUS.sm, fontFamily: FONT.sans, fontWeight: 600,
+        fontSize: size === "sm" ? SIZE.sm : SIZE.body, width: full ? "100%" : undefined, cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.5 : 1, letterSpacing: "0.01em", ...style,
+      }}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+const TONE_ICON: Record<Tone, typeof Check> = { neutral: Circle, progress: CircleDot, attention: Clock, issue: TriangleAlert, done: Check };
+
+/** Status: icon + word + tone. The word carries the meaning; color never does alone. */
+export function StatusPill({ tone, label, size = "md" }: { tone: Tone; label: string; size?: "md" | "sm" }) {
+  const Icon = TONE_ICON[tone];
+  const t = TONE[tone];
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 whitespace-nowrap"
+      style={{ background: t.bg, color: t.ink, border: `1px solid ${t.border}`, borderRadius: RADIUS.sm, padding: size === "sm" ? "1px 7px" : "3px 9px", fontSize: size === "sm" ? SIZE.xs : SIZE.sm, fontWeight: 600, letterSpacing: "0.02em" }}
+    >
+      <Icon size={size === "sm" ? 12 : 14} aria-hidden strokeWidth={2.4} />
+      {label}
+    </span>
+  );
+}
+
+/** Small label chip, e.g. a source or a mode. Not a status. */
+export function Tag({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "rose" }) {
+  return (
+    <span style={{ display: "inline-block", fontSize: SIZE.sm, fontWeight: 600, letterSpacing: "0.02em", padding: "2px 8px", borderRadius: RADIUS.sm, background: tone === "rose" ? T.blush : T.bone, color: tone === "rose" ? T.wine : T.forest }}>
       {children}
     </span>
   );
 }
 
-export type StatusTone = "neutral" | "info" | "success" | "warning" | "danger";
-const STATUS: Record<StatusTone, [bg: string, fg: string, Icon: LucideIcon]> = {
-  neutral: [T.sunken, T.textMuted, Info], info: [T.brandSoft, T.brandInk, Info], success: [T.successSoft, T.success, CheckCircle2],
-  warning: [T.warningSoft, T.warning, CircleAlert], danger: [T.dangerSoft, T.danger, XCircle],
-};
-
-/** Icon + word + tone, so state never depends on color alone. */
-export function StatusPill({ tone, children, icon }: { tone: StatusTone; children: ReactNode; icon?: LucideIcon }) {
-  const [bg, fg, Default] = STATUS[tone];
-  const Icon = icon ?? Default;
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5" style={{ background: bg, color: fg, fontSize: SIZE.xs + 1, fontWeight: 600, borderRadius: RADIUS.sm, whiteSpace: "nowrap" }}>
-      <Icon size={14} aria-hidden /> {children}
-    </span>
-  );
+/** Deterministic torn bottom edge, so paper looks hand-torn but never jitters between renders. */
+function tornPath(seed: number): string {
+  const pts: string[] = ["0% 0%", "100% 0%"];
+  let x = 100;
+  let n = seed * 9301 + 49297;
+  while (x > 0) {
+    n = (n * 9301 + 49297) % 233280;
+    const r = n / 233280;
+    pts.push(`${x.toFixed(1)}% calc(100% - ${(r * 9).toFixed(1)}px)`);
+    x -= 2.2 + r * 2.6;
+  }
+  pts.push("0% calc(100% - 4px)");
+  return `polygon(${pts.join(", ")})`;
 }
 
-export function Notice({ tone = "info", title, children }: { tone?: Exclude<StatusTone, "neutral">; title?: string; children: ReactNode }) {
-  const [bg, fg, Icon] = STATUS[tone];
+/** Cream paper with a torn bottom edge and a soft shadow. The patient app's main surface. */
+export function Paper({ children, torn = true, seed = 1, style, className }: { children: ReactNode; torn?: boolean; seed?: number; style?: CSSProperties; className?: string }) {
   return (
-    <div role="note" className="flex gap-3 px-4 py-3" style={{ background: bg, borderRadius: RADIUS.md, borderLeft: `4px solid ${fg}` }}>
-      <Icon size={18} color={fg} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden />
-      <div style={{ fontSize: SIZE.sm + 1, color: T.text, lineHeight: 1.5, minWidth: 0 }}>
-        {title && <b style={{ display: "block", marginBottom: 2 }}>{title}</b>}
+    <div style={{ filter: SHADOW.paper }} className={className}>
+      <div className="paper grain" style={{ clipPath: torn ? tornPath(seed) : undefined, borderRadius: torn ? `${RADIUS.sm}px ${RADIUS.sm}px 0 0` : RADIUS.sm, padding: torn ? "18px 18px 26px" : 18, ...style }}>
         {children}
       </div>
     </div>
   );
 }
 
-/** Patient-side container. */
-export function Card({ children, pad = 16, selected }: { children: ReactNode; pad?: number; selected?: boolean }) {
+/** Clinician container: titled header row, optional meta and actions, body. */
+export function Panel({ title, meta, actions, children, pad = true, style }: { title?: ReactNode; meta?: ReactNode; actions?: ReactNode; children: ReactNode; pad?: boolean; style?: CSSProperties }) {
   return (
-    <div style={{ background: T.surface, border: `1px solid ${selected ? T.brand : T.border}`, boxShadow: selected ? `inset 0 0 0 1px ${T.brand}` : undefined, borderRadius: RADIUS.md, padding: pad, minWidth: 0 }}>
-      {children}
-    </div>
-  );
-}
-
-/** Clinical container with a titled header row. */
-export function Panel({ title, right, children }: { title: ReactNode; right?: ReactNode; children: ReactNode }) {
-  return (
-    <section style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: RADIUS.md, minWidth: 0 }}>
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3" style={{ borderBottom: `1px solid ${T.border}` }}>
-        <h2 style={{ fontSize: SIZE.body - 1, fontWeight: 600, color: T.text }}>{title}</h2>
-        {right}
-      </div>
-      <div className="p-4">{children}</div>
+    <section style={{ background: T.cream, border: `1px solid ${T.hairline}`, borderRadius: RADIUS.md, boxShadow: SHADOW.card, ...style }}>
+      {(title || actions) && (
+        <header className="flex flex-wrap items-center justify-between gap-2" style={{ padding: "12px 16px", borderBottom: `1px solid ${T.hairline}` }}>
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            {title && <h2 style={{ fontSize: SIZE.body, fontWeight: 600, color: T.forest, margin: 0 }}>{title}</h2>}
+            {meta && <span style={{ fontSize: SIZE.sm, color: T.inkMuted }}>{meta}</span>}
+          </div>
+          {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+        </header>
+      )}
+      <div style={{ padding: pad ? 16 : 0 }}>{children}</div>
     </section>
   );
 }
 
-export function ClinHeader({ icon: Icon, title, sub, right }: { icon: LucideIcon; title: string; sub: string; right?: ReactNode }) {
+export function Field({ label, hint, children, htmlFor }: { label: string; hint?: string; children: ReactNode; htmlFor?: string }) {
   return (
-    <div className="flex flex-wrap items-center gap-4 py-4" style={{ borderBottom: `1px solid ${T.border}` }}>
-      <div className="flex items-center justify-center" style={{ width: 40, height: 40, background: T.brandSoft, borderRadius: RADIUS.md, flexShrink: 0 }}>
-        <Icon size={20} color={T.brand} aria-hidden />
-      </div>
-      <div style={{ minWidth: 0 }}>
-        <h1 style={{ color: T.text, fontSize: SIZE.lg, fontWeight: 600, lineHeight: 1.3 }}>{title}</h1>
-        <div style={{ color: T.textMuted, fontSize: SIZE.sm }}>{sub}</div>
-      </div>
-      <div className="flex flex-wrap items-center gap-2 ml-auto">{right}</div>
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={htmlFor} style={{ fontSize: SIZE.sm, fontWeight: 600, color: T.forest }}>{label}</label>
+      {children}
+      {hint && <span style={{ fontSize: SIZE.sm, color: T.inkMuted }}>{hint}</span>}
     </div>
   );
 }
 
-export function Metric({ label, value, unit, note, tone }: { label: string; value: string; unit?: string; note: ReactNode; tone: "flag" | "watch" | "ok" }) {
-  const col = tone === "flag" ? T.danger : tone === "watch" ? T.warning : T.success;
+export const inputStyle: CSSProperties = {
+  border: `1px solid ${T.line}`, borderRadius: RADIUS.sm, background: T.white, color: T.forest, padding: "10px 12px",
+  fontSize: SIZE.body, fontFamily: FONT.sans, minHeight: 44, width: "100%",
+};
+
+/** Switch with a label and a plain-language consequence. */
+export function Toggle({ on, onChange, label, detail, id }: { on: boolean; onChange: (on: boolean) => void; label: string; detail?: string; id: string }) {
   return (
-    <div className="p-3" style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: RADIUS.md }}>
-      <Label>{label}</Label>
-      <div className="flex items-baseline gap-1 mt-1">
-        <span style={{ fontFamily: FONT.mono, fontSize: SIZE.xl, color: T.text, fontWeight: 500 }} className="tnum">{value}</span>
-        {unit && <span style={{ fontSize: SIZE.xs, color: T.textMuted, fontFamily: FONT.mono }}>{unit}</span>}
-      </div>
-      <div className="mt-1 flex items-center gap-1" style={{ fontSize: SIZE.xs + 1, color: col, fontWeight: 600 }}>{note}</div>
+    <div className="flex items-center justify-between gap-4" style={{ padding: "12px 0", borderBottom: `1px solid ${T.hairline}` }}>
+      <label htmlFor={id} className="flex flex-col" style={{ cursor: "pointer" }}>
+        <span style={{ fontSize: SIZE.body, fontWeight: 600, color: T.forest }}>{label}</span>
+        {detail && <span style={{ fontSize: SIZE.sm, color: T.inkMuted }}>{detail}</span>}
+      </label>
+      <button
+        id={id} type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)}
+        style={{ width: 52, height: 30, borderRadius: 15, flexShrink: 0, background: on ? T.forest : T.hairline, border: `1px solid ${on ? T.forest : T.line}`, position: "relative", cursor: "pointer" }}
+      >
+        <span style={{ position: "absolute", top: 3, left: on ? 25 : 3, width: 22, height: 22, borderRadius: 11, background: T.cream, transition: "left .15s" }} />
+        <span className="sr-only">{on ? "On" : "Off"}</span>
+      </button>
     </div>
   );
 }
 
-type ButtonKind = "primary" | "secondary" | "quiet" | "danger";
-
-export function Button({ children, onClick, disabled, kind = "secondary", size = "md", full, label }: {
-  children: ReactNode; onClick?: () => void; disabled?: boolean; kind?: ButtonKind; size?: "md" | "lg"; full?: boolean; label?: string;
-}) {
-  const bg = disabled ? T.sunken : kind === "primary" ? T.brand : kind === "danger" ? T.danger : kind === "secondary" ? T.surface : "transparent";
-  const fg = disabled ? T.textSubtle : kind === "primary" || kind === "danger" ? T.textOnBrand : T.brand;
-  const border = kind === "secondary" && !disabled ? `1px solid ${T.borderStrong}` : "1px solid transparent";
+/** Selectable chip; selected is a Forest fill with a check, so state isn't color alone. */
+export function Chip({ selected, onClick, children, disabled }: { selected: boolean; onClick: () => void; children: ReactNode; disabled?: boolean }) {
   return (
-    <button type="button" aria-label={label} disabled={disabled} onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 ${full ? "w-full" : ""}`}
-      style={{
-        background: bg, color: fg, border, borderRadius: RADIUS.md, fontWeight: 600,
-        fontSize: size === "lg" ? SIZE.body : SIZE.sm, minHeight: size === "lg" ? 48 : 36, padding: size === "lg" ? "0 20px" : "0 14px",
-        cursor: disabled ? "not-allowed" : "pointer", textDecoration: kind === "quiet" ? "underline" : "none", textUnderlineOffset: 3,
-      }}>
+    <button
+      type="button" aria-pressed={selected} onClick={onClick} disabled={disabled}
+      className="inline-flex items-center gap-1.5"
+      style={{ minHeight: 44, padding: "8px 14px", borderRadius: RADIUS.sm, fontSize: SIZE.body, fontWeight: 500, background: selected ? T.forest : "transparent", color: selected ? T.cream : T.forest, border: `1px solid ${selected ? T.forest : T.line}`, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.45 : 1 }}
+    >
+      {selected && <Check size={15} aria-hidden strokeWidth={2.6} />}
       {children}
     </button>
   );
 }
 
-/** A bookable time. Day on top, time below; the selected one fills with brand and shows a check. */
-export function SlotButton({ day, time, selected, disabled, onClick }: { day: string; time: string; selected?: boolean; disabled?: boolean; onClick: () => void }) {
+/** Five open circles; the chosen one fills. Labelled ends say what low and high mean. */
+export function Dots({ label, value, onChange, low, high }: { label: string; value: number | null; onChange: (v: number) => void; low: string; high: string }) {
   return (
-    <button type="button" aria-pressed={selected} disabled={disabled} onClick={onClick} aria-label={`${day} at ${time}`}
-      className="flex flex-col items-center justify-center"
-      style={{
-        minWidth: 84, minHeight: 52, padding: "6px 10px", borderRadius: RADIUS.md, cursor: disabled ? "not-allowed" : "pointer",
-        background: selected ? T.brand : T.brandSoft, color: selected ? T.textOnBrand : T.brandInk,
-        border: `1px solid ${selected ? T.brand : "transparent"}`, opacity: disabled && !selected ? 0.5 : 1,
-      }}>
-      <span style={{ fontSize: SIZE.xs, fontWeight: 600 }}>{day}</span>
-      <span className="flex items-center gap-1 tnum" style={{ fontSize: SIZE.sm + 1, fontWeight: 600 }}>{selected && <Check size={14} aria-hidden />}{time}</span>
-    </button>
+    <fieldset style={{ border: 0, padding: "12px 0", margin: 0, borderBottom: `1px solid ${T.hairline}` }}>
+      <legend style={{ fontSize: SIZE.md, fontWeight: 600, color: T.forest, padding: 0, marginBottom: 8 }}>{label}</legend>
+      <div className="flex items-center justify-between gap-2" role="radiogroup" aria-label={label}>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${label} ${n} of 5${n === 1 ? `, ${low}` : n === 5 ? `, ${high}` : ""}`}
+            onClick={() => onChange(n)}
+            style={{ width: 46, height: 46, borderRadius: 23, border: `1.5px solid ${T.forest}`, background: value === n ? T.forest : "transparent", cursor: "pointer" }}
+          />
+        ))}
+      </div>
+      <div className="flex justify-between" style={{ fontSize: SIZE.sm, color: T.inkMuted, marginTop: 4 }}>
+        <span>{low}</span>
+        <span>{high}</span>
+      </div>
+    </fieldset>
   );
 }
 
-/** Numbered progress for a short flow. `current` is zero-based; steps before it show as done. */
-export function Stepper({ steps, current }: { steps: string[]; current: number }) {
+export function formatLeft(msLeft: number): string {
+  const s = Math.max(0, Math.ceil(msLeft / 1000));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}` : `${m}:${String(sec).padStart(2, "0")}`;
+}
+
+/** Time left on a hold, as digits and a bar. The digits are the signal; the bar only echoes them. */
+export function Countdown({ msLeft, totalMs, onDark }: { msLeft: number; totalMs: number; onDark?: boolean }) {
+  const pct = totalMs > 0 ? Math.max(0, Math.min(1, msLeft / totalMs)) : 0;
   return (
-    <nav aria-label="Progress">
-      <ol className="flex gap-1.5">
-        {steps.map((s, i) => {
-          const done = i < current;
-          const on = i === current;
-          return (
-            <li key={s} className="flex-1" style={{ minWidth: 0 }} aria-current={on ? "step" : undefined}>
-              <div style={{ height: 4, borderRadius: 2, background: done || on ? T.brand : T.border }} />
-              <div className="flex items-center gap-1 mt-1.5" style={{ fontSize: SIZE.xs, fontWeight: on ? 600 : 500, color: on ? T.text : done ? T.textMuted : T.textSubtle }}>
-                {done && <Check size={12} color={T.success} aria-hidden />}
-                <span className="truncate">{s}</span>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-    </nav>
+    <div role="timer" aria-live="off" aria-label={`${formatLeft(msLeft)} left on the hold`}>
+      <div className="flex items-baseline gap-2">
+        <span className="tnum" style={{ fontSize: SIZE.xl, fontWeight: 600, color: onDark ? T.cream : T.forest, fontFamily: FONT.sans }}>{formatLeft(msLeft)}</span>
+        <span style={{ fontSize: SIZE.sm, color: onDark ? T.blush : T.inkMuted }}>left on your hold</span>
+      </div>
+      <div style={{ height: 4, borderRadius: 2, background: onDark ? "rgba(250,244,238,.25)" : T.hairline, marginTop: 8, overflow: "hidden" }}>
+        <div style={{ width: `${pct * 100}%`, height: "100%", background: onDark ? T.blush : T.raspberry, transition: "width 1s linear" }} />
+      </div>
+    </div>
   );
 }
 
-export interface ToastState { msg: string; error: boolean }
+/** Inline banner for context or a rule. */
+export function Notice({ tone = "neutral", title, children }: { tone?: Tone; title?: string; children: ReactNode }) {
+  const t = TONE[tone];
+  const Icon = tone === "issue" ? TriangleAlert : tone === "done" ? Check : tone === "attention" ? Clock : Info;
+  return (
+    <div role={tone === "issue" ? "alert" : "note"} className="flex gap-2.5" style={{ background: t.bg, border: `1px solid ${t.border}`, borderRadius: RADIUS.sm, padding: "10px 12px", color: t.ink, fontSize: SIZE.sm, lineHeight: 1.45 }}>
+      <Icon size={17} aria-hidden style={{ flexShrink: 0, marginTop: 1 }} />
+      <div>
+        {title && <p style={{ fontWeight: 600, margin: "0 0 2px" }}>{title}</p>}
+        <div>{children}</div>
+      </div>
+    </div>
+  );
+}
 
-export function useToast() {
-  const [toast, setToast] = useState<ToastState | null>(null);
-  const timer = useRef<number | undefined>(undefined);
+/** Label/value rows for dense clinician detail. */
+export function Rows({ rows }: { rows: [string, ReactNode][] }) {
+  return (
+    <dl className="grid" style={{ gridTemplateColumns: "minmax(110px, 34%) 1fr", columnGap: 12, rowGap: 6, fontSize: SIZE.sm, margin: 0 }}>
+      {rows.map(([k, v]) => (
+        <div key={k} className="contents">
+          <dt style={{ color: T.inkMuted }}>{k}</dt>
+          <dd style={{ color: T.forest, margin: 0, overflowWrap: "anywhere" }}>{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export const th: CSSProperties = { textAlign: "left", fontSize: SIZE.xs, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: T.inkMuted, padding: "8px 12px", borderBottom: `1px solid ${T.hairline}`, whiteSpace: "nowrap" };
+export const td: CSSProperties = { fontSize: SIZE.sm, color: T.forest, padding: "10px 12px", borderBottom: `1px solid ${T.hairline}`, verticalAlign: "top" };
+
+/** Bottom-center confirmation of the last action. Refusals stay longer and use the rule's own words. */
+export function useToast(): [ReactNode, (msg: string, error?: boolean) => void] {
+  const [toast, setToast] = useState<{ msg: string; error: boolean } | null>(null);
+  const timer = useRef<number>();
   const show = useCallback((msg: string, error = false) => {
-    setToast({ msg, error });
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setToast(null), error ? 5200 : 2600);
+    setToast({ msg, error });
+    timer.current = window.setTimeout(() => setToast(null), error ? 7000 : 3200);
   }, []);
-  return [toast, show] as const;
+  const node = toast ? (
+    <div role={toast.error ? "alert" : "status"} className="no-print fixed left-1/2 flex items-center gap-3" style={{ bottom: "max(20px, env(safe-area-inset-bottom))", transform: "translateX(-50%)", zIndex: 60, maxWidth: "min(92vw, 520px)", background: toast.error ? T.wine : T.forest, color: T.cream, padding: "12px 16px", borderRadius: RADIUS.sm, boxShadow: SHADOW.overlay, fontSize: SIZE.sm, lineHeight: 1.4 }}>
+      {toast.error ? <TriangleAlert size={17} aria-hidden /> : <Check size={17} aria-hidden />}
+      <span>{toast.msg}</span>
+      <button type="button" onClick={() => setToast(null)} aria-label="Dismiss" style={{ color: T.cream, cursor: "pointer", padding: 4 }}>
+        <X size={15} aria-hidden />
+      </button>
+    </div>
+  ) : null;
+  return [node, show];
 }
 
-export function Toast({ toast }: { toast: ToastState | null }) {
-  if (!toast) return null;
-  return (
-    <div role="status" className="fixed left-1/2 -translate-x-1/2 z-50 px-4 py-3 flex items-center gap-2"
-      style={{ bottom: "calc(88px + env(safe-area-inset-bottom, 0px))", background: toast.error ? T.danger : T.navy, color: T.textOnBrand, fontSize: SIZE.sm, fontWeight: 600, borderRadius: RADIUS.md, boxShadow: ELEVATION.overlay, maxWidth: "92vw" }}>
-      {toast.error ? <AlertTriangle size={16} aria-hidden /> : <Check size={16} aria-hidden />} {toast.msg}
-    </div>
+/** Run a command; show the rule's refusal as a toast, or an optional confirmation. Returns true when it ran. */
+export function useAct(show: (msg: string, error?: boolean) => void) {
+  return useCallback(
+    (cmd: Command, ok?: string): boolean => {
+      const err = act(cmd);
+      if (err) show(err, true);
+      else if (ok) show(ok);
+      return err === null;
+    },
+    [show],
   );
 }
 
-export function Tabs<V extends string>({ tabs, value, onChange }: { tabs: { id: V; label: string; count?: number }[]; value: V; onChange: (t: V) => void }) {
-  return (
-    <div role="tablist" className="flex flex-wrap gap-x-6 gap-y-1" style={{ borderBottom: `1px solid ${T.border}` }}>
-      {tabs.map((t) => {
-        const on = t.id === value;
-        return (
-          <button key={t.id} type="button" role="tab" aria-selected={on} onClick={() => onChange(t.id)} className="flex items-center gap-1.5 py-2.5"
-            style={{ color: on ? T.brand : T.textMuted, borderBottom: `2px solid ${on ? T.brand : "transparent"}`, marginBottom: -1, fontSize: SIZE.sm, fontWeight: 600, cursor: "pointer" }}>
-            {t.label}
-            {t.count !== undefined && <span className="tnum" style={{ background: on ? T.brandSoft : T.sunken, borderRadius: RADIUS.sm, padding: "0 6px", fontSize: SIZE.xs }}>{t.count}</span>}
-          </button>
-        );
-      })}
-    </div>
-  );
+export function Empty({ children }: { children: ReactNode }) {
+  return <p style={{ fontSize: SIZE.sm, color: T.inkMuted, padding: "12px 0", margin: 0 }}>{children}</p>;
 }

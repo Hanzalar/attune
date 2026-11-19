@@ -16,7 +16,7 @@ export default defineConfig({
         patient: resolve(__dirname, "patient/index.html"),
         pcp: resolve(__dirname, "pcp/index.html"),
         specialist: resolve(__dirname, "specialist/index.html"),
-        guide: resolve(__dirname, "guide/index.html"),
+        ops: resolve(__dirname, "ops/index.html"),
       },
     },
   },

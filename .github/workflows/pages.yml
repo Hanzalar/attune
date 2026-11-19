@@ -1,5 +1,5 @@
 # Hosts the site on GitHub Pages: the landing page from the orphan `landing` branch at the root, and the app views
-# (/demo/, /patient/, /pcp/, /specialist/, /guide/) from this build. A push to `landing` re-runs this workflow.
+# (/demo/, /patient/, /pcp/, /specialist/, /ops/) from this build. A push to `landing` re-runs this workflow.
 # develop deploys a labelled preview today; once the first release passes the promotion gate,
 # switch the trigger to main so the public URL only serves verified builds.
 name: pages
