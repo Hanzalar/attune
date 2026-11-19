@@ -15,6 +15,9 @@
 - App: journal composer on Home after a live offer; Journal, Ask and AI assistants screens; Care team and Record
   updates; hub sync in the store.
 - Constitution rule 13 and `assistant` component rules, synced and installed.
+- Demo video tool (`scripts/demo-video`, `npm run demo:video`): 2:59, 1920x1080, 30 fps H.264, recorded from the
+  production build with synthetic data. AI scenes use labelled demo replies; the connector scene is labelled as
+  Attune's test client. Last run: 4,946 frames, no missed targets.
 
 ## 2. Decisions and deviations
 - Messages API through our own gateway, not Managed Agents (health data; no BAA eligibility; no stored sessions).

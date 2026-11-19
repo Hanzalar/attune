@@ -25,5 +25,8 @@
 - [ ] 5.5 Patient interviews on AI journaling (open question).
 - [ ] 5.6 Clinical copy review of assistant rules and answers.
 
-## 6. Handoff
-- [x] 6.1 Update handoff.md.
+## 6. Demo video
+- [x] 6.1 `npm run demo:video` records the scenario and the AI features to a 1080p MP4 (demo replies labelled).
+
+## 7. Handoff
+- [x] 7.1 Update handoff.md.
