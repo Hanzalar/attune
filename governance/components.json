@@ -14,6 +14,7 @@
         "Keep it pure: no I/O, no clock reads, no randomness. Callers pass timestamps.",
         "Every rule change ships with a test that fails without it. Refusals throw DomainError with a message a person can act on.",
         "Matching and criteria code must never read fee terms, payer or any commercial field; the invariance and source-scan tests stay.",
+        "Assistant commands accept drafts only; applyProposal is the patient's alone. Validate every drafted change with proposalProblem.",
         "Fill policy numbers (hold windows, batch sizes, freshness) live in config.ts; the product name lives in PRODUCT_NAME.",
         "Notification text carries no health details and fits one SMS; the notify tests stay.",
         "Demo data in demo.ts is synthetic and labelled (example); never add real names, NPIs or fax numbers."
@@ -30,6 +31,18 @@
         "Patient app is mobile-first: text 14px or larger, no red dots or badges, no infinite scroll, no horizontal scroll at 390px, tap targets at least 44px.",
         "Clinician portals stay usable at phone width even though they are designed for desktop.",
         "Keep files under 400 lines; split by screen or panel."
+      ]
+    },
+    {
+      "id": "assistant",
+      "path": "apps/assistant",
+      "description": "Assistant gateway: in-app Claude for the journal and Ask screens, record hub, and the MCP connector for Claude and ChatGPT",
+      "instructions": [
+        "Build every record text an assistant sees with assistantContext from @attune/domain; never assemble record data here.",
+        "Assistants only queue commands for the app; the app runs them through the domain. Never write the record from the gateway.",
+        "App endpoints (/api/*) answer only requests addressed to localhost; the connector requires a token from an active assistant link.",
+        "Call Claude through the official Anthropic SDK with structured outputs for drafts; handle refusal stop reasons and map SDK errors to sentences a patient can act on.",
+        "Keep the connector test (official MCP client over HTTP) passing without credentials. Synthetic data only (ADR-007)."
       ]
     }
   ]
