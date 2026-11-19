@@ -15,7 +15,8 @@
     "typecheck": "tsc -b packages/domain apps/web apps/assistant",
     "test": "vitest run",
     "check": "npm run typecheck && npm test && npm run build",
-    "assistant": "npm run start -w @attune/assistant"
+    "assistant": "npm run start -w @attune/assistant",
+    "demo:video": "npm run build && node scripts/demo-video/record.mjs"
   },
   "devDependencies": {
     "typescript": "5.6.3",

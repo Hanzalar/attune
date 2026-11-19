@@ -11,3 +11,4 @@ dist/
 .business/
 .landing/
 dist-types/
+scripts/demo-video/out/

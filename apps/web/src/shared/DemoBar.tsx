@@ -17,7 +17,7 @@ export function DemoBar({ here }: { here: View }) {
   const w = useWorld();
   const paused = w.clock.pausedAt !== null;
   return (
-    <div className="no-print flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5" style={{ padding: "6px 12px", background: T.forest, color: T.cream, fontSize: SIZE.xs + 1 }}>
+    <div data-demo-bar className="no-print flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5" style={{ padding: "6px 12px", background: T.forest, color: T.cream, fontSize: SIZE.xs + 1 }}>
       <a href={viewUrl("demo")} style={{ fontWeight: 600, color: T.cream }}>Demo hub</a>
       <nav aria-label="Demo views" className="flex flex-wrap gap-1">
         {VIEWS.map((v) => (
