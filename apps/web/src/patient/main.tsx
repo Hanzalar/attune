@@ -9,11 +9,14 @@ import { DEMO_TZ, patientHome, type Notice as NoticeT, type World } from "@attun
 import { RADIUS, SHADOW, SIZE, T } from "../design/tokens";
 import { DemoBar, mount } from "../shared/DemoBar";
 import { useNow, useWorld } from "../shared/store";
+import { Ask } from "./Ask";
+import { Assistants } from "./Assistants";
 import { Booked } from "./Booked";
 import { Care } from "./Care";
 import { CheckIn } from "./CheckIn";
 import { Home } from "./Home";
 import { Insurance } from "./Insurance";
+import { Journal } from "./Journal";
 import { PATIENT_ID, go, useRoute, type Route } from "./nav";
 import { Offer } from "./Offer";
 import { Onboarding } from "./Onboarding";
@@ -93,6 +96,9 @@ function Current({ route, w, now }: { route: Route; w: World; now: string }) {
     case "booked": return <Booked w={w} patient={patient} now={now} />;
     case "pack": return <Pack w={w} patient={patient} now={now} />;
     case "summary": return <Summary w={w} patient={patient} />;
+    case "journal": return <Journal w={w} patient={patient} />;
+    case "ask": return <Ask w={w} patient={patient} q={route.q} />;
+    case "assistants": return <Assistants w={w} patient={patient} />;
     case "home": return <Home w={w} patient={patient} now={now} />;
   }
 }

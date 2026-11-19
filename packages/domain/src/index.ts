@@ -9,6 +9,8 @@ export * from "./matching";
 export * from "./notify";
 export * from "./agent";
 export * from "./commands";
+export * from "./assistant";
+export * from "./demoAssistant";
 export * from "./views";
 export * from "./fhir";
 export * from "./demo";

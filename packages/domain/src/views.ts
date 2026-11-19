@@ -81,7 +81,7 @@ export function trends(checkIns: CheckIn[], today: string, days = 14): { dates: 
 
 /** Which Patient Pack sections a recipient may open right now. */
 export function packAccess(w: World, patientId: string, recipientId: string, sections: readonly SectionKey[]): Record<SectionKey, boolean> {
-  const out = { story: false, trends: false, results: false, meds: false, insurance: false, summaries: false };
+  const out = { story: false, trends: false, results: false, meds: false, insurance: false, summaries: false, journal: false, care: false };
   for (const s of sections) out[s] = canSee(w, patientId, recipientId, s);
   return out;
 }

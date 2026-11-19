@@ -18,6 +18,8 @@ export const SECTION: Record<SectionKey, { label: string; detail: string }> = {
   meds: { label: "Medications", detail: "What you take now and what you have tried" },
   insurance: { label: "Insurance", detail: "Plan and member ID, not the card photo" },
   summaries: { label: "Visit summaries", detail: "What specialists send back after a visit" },
+  journal: { label: "Journal", detail: "What you write in Attune, in your words" },
+  care: { label: "Referrals and visits", detail: "Referral status, booked visits and who has your Pack" },
 };
 
 /** Clinician-facing section names. */
@@ -28,6 +30,8 @@ export const SECTION_STAFF: Record<SectionKey, string> = {
   meds: "Medications",
   insurance: "Insurance",
   summaries: "Visit summaries",
+  journal: "Patient journal",
+  care: "Referrals and visits",
 };
 
 export const REFERRAL_STATUS: Record<ReferralStatus, { label: string; tone: Tone; patient: string }> = {
@@ -89,6 +93,7 @@ export const ROLE_LABEL: Record<string, string> = {
   specialist_provider: "Specialist",
   ops: "Attune operations",
   agent: "Attune",
+  assistant: "AI assistant (connected by the patient)",
 };
 
 export const CHECKIN_SCALES: Record<"mood" | "sleep" | "energy" | "skin", { label: string; low: string; high: string }> = {

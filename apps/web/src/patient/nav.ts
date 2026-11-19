@@ -17,14 +17,19 @@ export type Route =
   | { name: "offer"; id: string }
   | { name: "booked" }
   | { name: "pack" }
-  | { name: "summary" };
+  | { name: "summary" }
+  | { name: "journal" }
+  | { name: "ask"; q: string }
+  | { name: "assistants" };
 
-const SIMPLE = ["welcome", "checkin", "record", "care", "share", "insurance", "waitlist", "booked", "pack", "summary"] as const;
+const SIMPLE = ["welcome", "checkin", "record", "care", "share", "insurance", "waitlist", "booked", "pack", "summary", "journal", "assistants"] as const;
 
 export function parse(hash: string): Route {
-  const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+  const [path = "", query = ""] = hash.replace(/^#\/?/, "").split("?");
+  const parts = path.split("/").filter(Boolean);
   const [head, arg] = parts;
   if (head === "offer" && arg) return { name: "offer", id: decodeURIComponent(arg) };
+  if (head === "ask") return { name: "ask", q: new URLSearchParams(query).get("q") ?? "" };
   const simple = SIMPLE.find((s) => s === head);
   return simple ? { name: simple } : { name: "home" };
 }

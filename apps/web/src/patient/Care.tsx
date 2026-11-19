@@ -2,7 +2,7 @@
  * Care team: everyone she shares with, and a switch per section per office. Turning one off stops future sharing;
  * we say plainly that an office may keep what it already received.
  */
-import { ALL_SECTIONS, SECTION, SPECIALTY, canSee, recipientsOf, type Patient, type World } from "@attune/domain";
+import { AI_ASSISTANTS, ALL_SECTIONS, ASSISTANT_SECTIONS, SECTION, SPECIALTY, activeLink, canSee, recipientsOf, type Patient, type World } from "@attune/domain";
 import { SIZE, T } from "../design/tokens";
 import { dateShort } from "../shared/format";
 import { Button, Notice, Overline, Paper, Toggle, Voice, useAct, useToast } from "../shared/ui";
@@ -17,6 +17,26 @@ export function Care({ w, patient }: { w: World; patient: Patient }) {
   return (
     <Screen overline="Care team" title="Who sees what" sub="Your doctors see only the parts you switch on. Every change is logged.">
       <Notice>Turning a section off stops future sharing. The office may keep what it already received.</Notice>
+      <Paper seed={50} torn={false}>
+        <Overline>AI assistants</Overline>
+        {AI_ASSISTANTS.some((a) => activeLink(w, patient.id, a.id)) ? (
+          <ul className="flex flex-col gap-1" style={{ listStyle: "none", margin: "8px 0 0", padding: 0 }}>
+            {AI_ASSISTANTS.filter((a) => activeLink(w, patient.id, a.id)).map((a) => (
+              <li key={a.id}>
+                <Body><strong>{a.name}</strong> <span style={{ color: T.inkMuted }}>({a.vendor})</span></Body>
+                <Small>{ASSISTANT_SECTIONS.filter((s) => canSee(w, patient.id, a.id, s)).length} of {ASSISTANT_SECTIONS.length} parts shared</Small>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Body style={{ marginTop: 8 }}>Journal and ask with Claude or ChatGPT. They read only what you switch on.</Body>
+        )}
+        <div style={{ marginTop: 12 }}>
+          <Button full variant="secondary" onClick={() => go("/assistants")}>
+            {AI_ASSISTANTS.some((a) => activeLink(w, patient.id, a.id)) ? "Manage assistants" : "Connect Claude or ChatGPT"}
+          </Button>
+        </div>
+      </Paper>
       {recipients.length === 0 && (
         <Paper seed={51}>
           <Body>You aren't sharing with anyone yet.</Body>

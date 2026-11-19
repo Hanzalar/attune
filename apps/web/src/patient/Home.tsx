@@ -1,6 +1,7 @@
 /**
- * Home: the one patient home screen. A live offer first, then her referral, then today's check-in, then any new
- * summary, and then it ends. One finite page: no feed, no badges, no red dots.
+ * Home: the one patient home screen. A live offer first (it's time-critical), then the journal composer (the main
+ * way in), then her referral, today's check-in and any new summary, and then it ends. One finite page: no feed, no
+ * badges, no red dots.
  */
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
@@ -10,6 +11,7 @@ import {
 import { SIZE, T } from "../design/tokens";
 import { daysWaiting, when } from "../shared/format";
 import { Button, Countdown, Ink, Notice, Overline, Paper, StatusPill, Voice, useAct, useToast } from "../shared/ui";
+import { Composer } from "./Composer";
 import { ME, PATIENT_ID, dayNumber, go, greeting, weekdayName } from "./nav";
 import { Body, Screen, Small } from "./Screen";
 
@@ -100,6 +102,7 @@ export function Home({ w, patient, now }: { w: World; patient: Patient; now: str
       }
     >
       {h.offer && <OfferCard h={h.offer} now={now} onAccept={accept} />}
+      <Composer w={w} onHome />
       <ReferralCard w={w} h={h} patient={patient} now={now} />
       {!h.checkedInToday ? (
         <Card overline="Check-in · about a minute" title="How are you, really?" seed={6}>

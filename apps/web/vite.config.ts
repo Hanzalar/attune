@@ -6,6 +6,8 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: process.env.BASE_PATH ?? "/",
   plugins: [react()],
+  // In development, the assistant gateway (`npm run assistant`) answers under the app's own origin.
+  server: { proxy: { "/api": process.env.ATTUNE_GATEWAY ?? "http://127.0.0.1:8787" } },
   define: {
     __BUILD_SHA__: JSON.stringify((process.env.GITHUB_SHA ?? "local").slice(0, 7)),
   },

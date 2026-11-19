@@ -2,7 +2,10 @@
  * My Record: what's in each section, who can see it, her story in her own words, and who has looked.
  */
 import { useState, type ReactNode } from "react";
-import { ALL_SECTIONS, DEMO_TZ, SECTION, canSee, nameOf, recipientsOf, todayIn, type Patient, type SectionKey, type World } from "@attune/domain";
+import {
+  AI_ASSISTANTS, ALL_SECTIONS, DEMO_TZ, MODE, REFERRAL_STATUS, SECTION, SPECIALTY, canSee, nameOf, recipientsOf, todayIn, type Patient,
+  type RecordView, type SectionKey, type World,
+} from "@attune/domain";
 import { SIZE, T } from "../design/tokens";
 import { ago, dateShort, when } from "../shared/format";
 import { Trends } from "../shared/Trends";
@@ -61,10 +64,24 @@ function Story({ patient }: { patient: Patient }) {
   );
 }
 
+/** "Claude read your labs and results" for an assistant; "Alex R. at Cedar Family Medicine opened …" for staff. */
+function ViewLine({ w, v }: { w: World; v: RecordView }) {
+  const labels = v.sections.map((s) => SECTION[s].label.replace(/^Your /, "").toLowerCase());
+  const what = labels.length > 1 ? `${labels.slice(0, -1).join(", ")} and ${labels.at(-1)}` : (labels[0] ?? "record");
+  const assistant = AI_ASSISTANTS.find((a) => a.id === v.recipientId);
+  return assistant ? (
+    <Body><strong>{assistant.name}</strong> read your {what}</Body>
+  ) : (
+    <Body><strong>{v.viewer}</strong> at {nameOf(w, v.recipientId)} opened your {what}</Body>
+  );
+}
+
 export function Record({ w, patient, now }: { w: World; patient: Patient; now: string }) {
   const plan = patient.insurance ? w.plans.find((p) => p.id === patient.insurance?.planId) : undefined;
   const summaries = w.summaries.filter((s) => w.referrals.some((r) => r.id === s.referralId && r.patientId === patient.id));
   const views = w.views.filter((v) => v.patientId === patient.id).sort((a, b) => b.at.localeCompare(a.at));
+  const entries = w.journal.filter((j) => j.patientId === patient.id);
+  const referrals = w.referrals.filter((r) => r.patientId === patient.id);
 
   const content: Record<SectionKey, ReactNode> = {
     story: <Story patient={patient} />,
@@ -92,11 +109,28 @@ export function Record({ w, patient, now }: { w: World; patient: Patient; now: s
         </div>
       ))
     ) : <Body muted>After a specialist visit, the summary lands here.</Body>,
+    care: referrals.length ? (
+      referrals.map((r) => {
+        const slot = r.slotId ? w.slots.find((s) => s.id === r.slotId) : undefined;
+        return (
+          <div key={r.id}>
+            <Body><strong>{SPECIALTY[r.specialty].label}</strong> · {REFERRAL_STATUS[r.status].label}</Body>
+            {slot && <Small>{when(slot.startsAt)} · {slot.provider} · {nameOf(w, slot.practiceId)} · {MODE[slot.mode]}</Small>}
+          </div>
+        );
+      })
+    ) : <Body muted>No referrals yet.</Body>,
+    journal: (
+      <>
+        <Body>{entries.length ? `${entries.length} entr${entries.length === 1 ? "y" : "ies"}, latest ${dateShort(entries.at(-1)?.at ?? "")}.` : "Nothing written yet."}</Body>
+        <a href="#/journal" style={{ color: T.raspberry, fontSize: SIZE.body, minHeight: 44, display: "inline-flex", alignItems: "center", textDecoration: "underline", textUnderlineOffset: 3 }}>Open your journal</a>
+      </>
+    ),
   };
 
   return (
     <Screen overline="My record" title="Yours, in one place" sub="What's in it, who can see each part, and who has looked.">
-      {ALL_SECTIONS.map((s, i) => (
+      {[...ALL_SECTIONS, "care" as const, "journal" as const].map((s, i) => (
         <Block key={s} section={s} w={w} patient={patient} seed={40 + i}>{content[s]}</Block>
       ))}
       <div className="flex flex-col gap-2">
@@ -112,8 +146,8 @@ export function Record({ w, patient, now }: { w: World; patient: Patient; now: s
           <ol className="flex flex-col" style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {views.map((v) => (
               <li key={`${v.at}-${v.viewer}`} style={{ padding: "10px 0", borderBottom: `1px solid ${T.hairline}` }}>
-                <Body><strong>{v.viewer}</strong> at {nameOf(w, v.recipientId)}</Body>
-                <Small>{when(v.at)} ({ago(v.at, now)}) · {v.sections.map((s) => SECTION[s].label.toLowerCase()).join(", ")}</Small>
+                <ViewLine w={w} v={v} />
+                <Small>{when(v.at)} ({ago(v.at, now)})</Small>
               </li>
             ))}
           </ol>

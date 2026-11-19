@@ -1,0 +1,20 @@
+{
+  "name": "@attune/assistant",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Attune assistant gateway: in-app Claude for the journal and Ask screens, and an MCP connector for Claude and ChatGPT.",
+  "type": "module",
+  "scripts": {
+    "start": "tsx --env-file-if-exists=../../.env.local src/server.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.4.0",
+    "@attune/domain": "0.1.0",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.1",
+    "tsx": "4.23.15"
+  }
+}

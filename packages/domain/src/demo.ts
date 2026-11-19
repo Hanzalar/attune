@@ -199,9 +199,9 @@ function base(now: string, mode: "fresh" | "fill"): World {
     }
   }
   return {
-    schema: 3, clock: { speed: DEFAULT_DEMO_SPEED, pausedAt: null, offsetMs: 0 }, plans: DEMO_PLANS, practices: DEMO_PRACTICES,
+    schema: 4, clock: { speed: DEFAULT_DEMO_SPEED, pausedAt: null, offsetMs: 0 }, plans: DEMO_PLANS, practices: DEMO_PRACTICES,
     feeTerms: DEMO_FEES, patients, referrals: bg.referrals, slots: [], offers: [], consents, views: [], shareCodes: [], summaries: [],
-    ledger: [], notices: [], log: [],
+    ledger: [], notices: [], log: [], assistants: [], journal: [], proposals: [],
   };
 }
 

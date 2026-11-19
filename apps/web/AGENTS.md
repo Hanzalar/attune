@@ -1,6 +1,6 @@
 <!-- CONSTITUTION:START -->
 Generated from https://github.com/Hanzalar/attune/tree/meta/governance.
-Source SHA-256: `25efcf711b801a7f064944b99eb9a7a94a1a141239ce82f2aa267fdfa1fab7f3`.
+Source SHA-256: `0417ada0d96d6d34a9e4839a11d57fba5163667b0e1e7e2917eb6bfe0b9fa036`.
 Edit canonical sources in specs repo; regenerate this managed block.
 
 # Component: web (Patient app, PCP portal, specialist portal, ops and demo hub over one shared record)

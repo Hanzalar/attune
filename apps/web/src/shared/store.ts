@@ -8,7 +8,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { DomainError, demoWorld, run, settle, type Command, type World } from "@attune/domain";
 
-const KEY = "attune.world.v3";
+const KEY = "attune.world.v4";
 const channel = typeof BroadcastChannel === "undefined" ? null : new BroadcastChannel("attune-world");
 const listeners = new Set<() => void>();
 
@@ -26,7 +26,7 @@ function load(): World {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as World;
-      if (parsed.schema === 3) return parsed;
+      if (parsed.schema === 4) return parsed;
     }
   } catch {
     // Storage blocked or corrupt: start from the demo world.
@@ -94,6 +94,41 @@ export function resetWorld(mode: "fresh" | "fill") {
 
 let ticking = false;
 
+/**
+ * Sync with the assistant gateway's hub, when one is running: push the record so a connected assistant can read
+ * what she shared, and pull what assistants sent through the MCP connector (journal entries, drafts). Pulled items
+ * run through act(), so the domain checks the connection and consent like any other command. Without a gateway
+ * (the public demo) this backs off quietly.
+ */
+const HUB = `${import.meta.env.VITE_ASSISTANT_URL ?? ""}/api/hub`;
+let pushed: World | null = null;
+let hubRetryAt = 0;
+let hubBusy = false;
+
+async function syncHub() {
+  if (hubBusy || Date.now() < hubRetryAt) return;
+  hubBusy = true;
+  try {
+    if (pushed !== state) {
+      const snapshot = state;
+      const put = await fetch(`${HUB}/world`, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(snapshot) });
+      if (!put.ok) throw new Error("hub unavailable");
+      pushed = snapshot;
+    }
+    const res = await fetch(`${HUB}/inbox`);
+    if (!res.ok) throw new Error("hub unavailable");
+    const { items } = (await res.json()) as { items: { id: string; command: Command }[] };
+    if (items.length) {
+      const results = items.map((item) => ({ id: item.id, error: act(item.command) }));
+      await fetch(`${HUB}/ack`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ results }) });
+    }
+  } catch {
+    hubRetryAt = Date.now() + 15_000;
+  } finally {
+    hubBusy = false;
+  }
+}
+
 /** Start the single shared ticker. Safe to call from every page; only one tab runs it at a time. */
 export function startTicker() {
   if (ticking || typeof window === "undefined") return;
@@ -103,6 +138,7 @@ export function startTicker() {
       window.setInterval(() => {
         const next = settle(state, nowIso());
         if (next !== state) publish(next, true);
+        void syncHub();
       }, 1000);
     });
   if (navigator.locks?.request) void navigator.locks.request("attune-ticker", loop);

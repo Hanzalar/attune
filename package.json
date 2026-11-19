@@ -2,20 +2,26 @@
   "name": "attune",
   "version": "0.1.0",
   "private": true,
-  "description": "Attune: patient-owned PMOS referral agent. Patient app, PCP admin and specialist admin web views over one shared referral record.",
+  "description": "Attune: patient-owned PMOS record with cancellation fill and an AI-native journal. Patient app, PCP and specialist portals over one shared record, plus an assistant gateway for Claude and ChatGPT.",
   "type": "module",
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev": "npm run dev -w @attune/web",
     "build": "npm run build -w @attune/web",
     "preview": "npm run preview -w @attune/web",
-    "typecheck": "tsc -b packages/domain apps/web",
+    "typecheck": "tsc -b packages/domain apps/web apps/assistant",
     "test": "vitest run",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run typecheck && npm test && npm run build",
+    "assistant": "npm run start -w @attune/assistant"
   },
   "devDependencies": {
     "typescript": "5.6.3",
     "vitest": "2.1.8"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

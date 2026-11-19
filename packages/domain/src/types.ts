@@ -4,13 +4,16 @@
  * hosted views can store it, sync it across tabs and replay it.
  */
 
-/** Who can act. `agent` is Attune itself: it checks, matches and delivers; it never signs or decides who qualifies. */
-export type Role = "patient" | "pcp_ma" | "pcp_physician" | "specialist_staff" | "specialist_provider" | "ops" | "agent";
+/**
+ * Who can act. `agent` is Attune itself: it checks, matches and delivers; it never signs or decides who qualifies.
+ * `assistant` is an AI assistant she connected (Claude, ChatGPT): it reads what she grants and drafts; she approves.
+ */
+export type Role = "patient" | "pcp_ma" | "pcp_physician" | "specialist_staff" | "specialist_provider" | "ops" | "agent" | "assistant";
 
 export type Specialty = "gyno" | "endo";
 
-/** Sections of her record. Consent is granted per section, per recipient. */
-export type SectionKey = "story" | "trends" | "results" | "meds" | "insurance" | "summaries";
+/** Sections of her record. Consent is granted per section, per recipient. `journal` and `care` go only to assistants. */
+export type SectionKey = "story" | "trends" | "results" | "meds" | "insurance" | "summaries" | "journal" | "care";
 
 export type PlanType = "HMO" | "POS" | "EPO" | "PPO";
 
@@ -40,13 +43,14 @@ export interface Story {
   words: string;
 }
 
+/** One day's check-in. She rates whichever scales she wants; a journal draft may fill only some. */
 export interface CheckIn {
   /** Local calendar date, YYYY-MM-DD. */
   date: string;
-  mood: Score;
-  sleep: Score;
-  energy: Score;
-  skin: Score;
+  mood?: Score;
+  sleep?: Score;
+  energy?: Score;
+  skin?: Score;
 }
 
 /** A lab or imaging result already on file. Shown with its source and the lab's own range; Attune adds no flags. */
@@ -235,7 +239,7 @@ export interface Consent {
   section: SectionKey;
   grantedAt: string;
   revokedAt: string | null;
-  via: "share_code" | "offer" | "patient";
+  via: "share_code" | "offer" | "patient" | "assistant";
 }
 
 export interface RecordView {
@@ -301,6 +305,47 @@ export interface AuditEvent {
   shared?: { recipientId: string; sections: SectionKey[] };
 }
 
+/** An AI assistant she connected. The token identifies its connector; it reads only sections she grants. */
+export interface AssistantLink {
+  assistantId: string;
+  patientId: string;
+  token: string;
+  connectedAt: string;
+  disconnectedAt: string | null;
+}
+
+export interface JournalEntry {
+  id: string;
+  patientId: string;
+  at: string;
+  text: string;
+  /** Who wrote it: her, in the app, or an assistant on her behalf (e.g. she journaled in Claude). */
+  source: "patient" | string;
+  /** The assistant's short acknowledgement, if any. Never advice. */
+  reply: string | null;
+  replyBy: string | null;
+}
+
+/** A change an assistant drafted from her journal. Nothing changes her record until she applies it. */
+export type Proposal =
+  | { kind: "checkIn"; date: string; mood?: Score; sleep?: Score; energy?: Score; skin?: Score }
+  | { kind: "addMed"; name: string; detail: string }
+  | { kind: "stopMed"; name: string }
+  | { kind: "storyNote"; text: string };
+
+export interface ProposalRecord {
+  id: string;
+  patientId: string;
+  entryId: string | null;
+  by: string;
+  at: string;
+  proposal: Proposal;
+  /** The words in her entry it came from. */
+  why: string;
+  status: "pending" | "applied" | "dismissed";
+  decidedAt: string | null;
+}
+
 export interface Clock {
   /** Hold windows run this many times faster than real time. 1 outside demo mode. */
   speed: number;
@@ -311,7 +356,7 @@ export interface Clock {
 }
 
 export interface World {
-  schema: 3;
+  schema: 4;
   clock: Clock;
   plans: Plan[];
   practices: Practice[];
@@ -327,4 +372,7 @@ export interface World {
   ledger: LedgerEntry[];
   notices: Notice[];
   log: AuditEvent[];
+  assistants: AssistantLink[];
+  journal: JournalEntry[];
+  proposals: ProposalRecord[];
 }

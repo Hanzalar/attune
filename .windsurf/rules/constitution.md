@@ -4,7 +4,7 @@ trigger: always_on
 
 <!-- CONSTITUTION:START -->
 Generated from https://github.com/Hanzalar/attune/tree/meta/governance.
-Source SHA-256: `25efcf711b801a7f064944b99eb9a7a94a1a141239ce82f2aa267fdfa1fab7f3`.
+Source SHA-256: `0417ada0d96d6d34a9e4839a11d57fba5163667b0e1e7e2917eb6bfe0b9fa036`.
 Edit canonical sources in specs repo; regenerate this managed block.
 
 [Notice: Implementation Checkout]
@@ -72,4 +72,5 @@ Attune is a patient-owned referral agent for PMOS (formerly PCOS). It drafts; pe
 10. **Web first, mobile-first patient app.** Ship as one web build: patient app (installable PWA), PCP admin, specialist admin. A native shell may wrap the patient app later and reuses `packages/domain`; no native-only product features without an ADR.
 11. **Build only what discovery supports.** Every capability links to a de-identified note on `business`.
 12. **No tech debt by default.** No `any`, no dead code, no hardcoded URLs or keys, no file over 400 lines without a written reason in the handoff.
+13. **Assistants draft; she approves.** An AI assistant she connects (Claude, ChatGPT or any MCP client) is a consent recipient like a practice: it reads only the sections she grants, every read is logged where she can see it, and anything it writes is a draft she applies or dismisses. Assistants never diagnose, interpret results or advise treatment. Health data goes to a model provider only through a gateway we host, and real data needs a BAA with that provider first.
 <!-- CONSTITUTION:END -->

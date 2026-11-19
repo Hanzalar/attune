@@ -3,6 +3,7 @@
  * event naming the actor and anything that left her record, then lets the agent settle follow-ups.
  */
 import { settle } from "./agent";
+import { applyAssistantCommand, type AssistantBody } from "./assistant";
 import { ATTESTATION, CONFIRM_WINDOW_HOURS, MAX_HARDEST, PACK_SECTIONS } from "./config";
 import { canSee, grant, newShareCode, normalizeCode, revoke } from "./consent";
 import { SECTION_STAFF, SPECIALTY } from "./labels";
@@ -42,7 +43,7 @@ type Body =
   | { type: "simulateReply"; offerId: string; accept: boolean }
   | { type: "setClock"; clock: Partial<Pick<Clock, "speed" | "offsetMs">> & { paused?: boolean } };
 
-export type Command = Body & { by: Role; who: string };
+export type Command = (Body | AssistantBody) & { by: Role; who: string };
 export type CommandType = Command["type"];
 
 const PCP: Role[] = ["pcp_ma", "pcp_physician"];
@@ -121,7 +122,7 @@ function apply(w: World, c: Command, now: string): World {
     }
 
     case "viewRecord": {
-      allow(c.by, [...PCP, ...SPECIALIST], "Viewing a record");
+      allow(c.by, [...PCP, ...SPECIALIST, "assistant"], "Viewing a record");
       const blocked = c.sections.filter((s) => !canSee(w, c.patientId, c.recipientId, s));
       need(blocked.length === 0, `The patient hasn't shared ${blocked.map((s) => SECTION_STAFF[s].toLowerCase()).join(", ")} with you.`);
       const recent = w.views.some(
@@ -304,6 +305,14 @@ function apply(w: World, c: Command, now: string): World {
     case "setClock":
       allow(c.by, ["ops"], "Changing the demo clock");
       return setClock(w, c.clock, now, log);
+
+    case "connectAssistant":
+    case "disconnectAssistant":
+    case "writeJournal":
+    case "assistantReply":
+    case "applyProposal":
+    case "dismissProposal":
+      return applyAssistantCommand(w, c, now, log);
   }
 }
 
