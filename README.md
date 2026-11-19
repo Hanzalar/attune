@@ -9,15 +9,15 @@ them, or they into it. It holds only the static page: no build step, no framewor
 
 | Path | What it is |
 | --- | --- |
-| `index.html` | The page. Three audience views (patients, PCP offices, specialists) routed by `#patients`, `#pcp`, `#specialists`. |
-| `site/tokens.css` | Attune Clinical UI tokens and self-hosted font faces. Mirrors `apps/web/src/design/tokens.ts` on `develop`; change both together. |
+| `index.html` | The page: hero, where referrals break, how the cancellation fill works, three audience views (patients, PCP offices, specialists) routed by `#patients`, `#pcp`, `#specialists`, rules, and status. |
+| `site/tokens.css` | Attune design tokens (the handoff palette) and self-hosted font faces. Mirrors `apps/web/src/design/tokens.ts` on `develop`; change both together. |
 | `site/landing.css` | Page styles, built only from the tokens. |
 | `site/landing.js` | Tab behaviour. Without it, every view stays visible. |
-| `site/fonts/` | IBM Plex Sans and Mono (latin), self-hosted, with the SIL Open Font License in `OFL.txt`. |
-| `site/favicon.svg` | The Attune mark. |
+| `site/fonts/` | Instrument Sans (400, 500, 600) and Instrument Serif Italic (latin), self-hosted, with the SIL Open Font License in `OFL.txt`. |
+| `site/favicon.svg` | The Attune mark: a bloom drawn in code on Orchid Wine, the same as the app's favicon. |
 
 Everything except `index.html` lives under `site/`, so nothing collides with the app's files at the site root
-(`assets/`, `favicon.svg`, `manifest.webmanifest`, `patient/`, `pcp/`, `specialist/`, `guide/`, `demo/`).
+(`assets/`, `favicon.svg`, `manifest.webmanifest`, `demo/`, `patient/`, `pcp/`, `specialist/`, `ops/`).
 Links to the app are relative (`demo/`, `patient/`, ...), so they work under `/attune/` and locally.
 
 ## How it deploys
