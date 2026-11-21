@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Attune · Patient-owned referrals for PMOS</title>
-  <meta name="description" content="Attune is a patient-owned referral agent for PMOS. It turns a patient's tracker data and records into a referral packet, finds an in-network OB/GYN with an open time, gets the PCP office's sign-off and follows up until the visit.">
-  <meta name="theme-color" content="#0F2338">
+  <title>Attune · A patient-owned record for PMOS</title>
+  <meta name="description" content="Attune is a patient-owned PMOS record her PCP, gyno and endo all see. The prototype fills a specialist's cancellation with a patient who is already referred, insurance-checked and has her record on one page.">
+  <meta name="theme-color" content="#5A1428">
   <link rel="icon" href="site/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="site/tokens.css">
   <link rel="stylesheet" href="site/landing.css">
@@ -16,81 +16,141 @@
     <symbol id="i-check" viewBox="0 0 20 20"><path d="M4 10.5l3.5 3.5L16 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-shield" viewBox="0 0 20 20"><path d="M10 2l6 2.2v5.2c0 4-2.6 6.9-6 8.6-3.4-1.7-6-4.6-6-8.6V4.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7 10l2.2 2.2L13.2 8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 20 20"><path d="M4 10h11M11 5.5L15.5 10 11 14.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-clock" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 6v4.3l2.8 1.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
     <symbol id="i-info" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 9v5M10 6.2v.1" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
   </svg>
 
   <a class="skip" href="#main">Skip to content</a>
 
-  <div class="band">
+  <div class="band grain">
     <header class="wrap topbar">
       <a class="wordmark" href="./" aria-label="Attune home">
-        <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect width="28" height="28" rx="6" fill="#0B5E8E"/><rect x="7" y="11" width="3" height="10" rx="1.5" fill="#fff"/><rect x="12.5" y="7" width="3" height="14" rx="1.5" fill="#fff"/><rect x="18" y="13" width="3" height="8" rx="1.5" fill="#fff"/></svg>
+        <svg class="mark" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="9" fill="#5A1428" stroke="rgba(250,244,238,.35)"/><g transform="translate(16 16.5)" fill="#F0C9C8" opacity=".92"><ellipse cx="0" cy="-6" rx="3.6" ry="6"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(72)"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(144)"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(216)"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(288)"/></g><circle cx="16" cy="16.5" r="2.6" fill="#5A1428"/></svg>
         <span>Attune</span>
       </a>
       <nav class="topnav" aria-label="Main">
-        <a href="#views">How it works</a>
+        <a href="#fill">How the fill works</a>
+        <a href="#views">Views</a>
         <a href="#rules">Rules</a>
-        <a href="guide/">Patient walkthrough</a>
-        <a class="btn btn-light btn-sm" href="demo/">Try the demo</a>
+        <a class="btn btn-light btn-sm" href="demo/">Open the demo</a>
       </nav>
     </header>
 
     <section class="wrap hero" aria-labelledby="hero-h">
       <div class="hero-copy">
-        <p class="overline">Patient-owned referrals for PMOS</p>
-        <h1 id="hero-h">The referral agent that gets a PMOS patient from her PCP to the right OB/GYN, and back.</h1>
-        <p class="lede">PMOS is the new name for PCOS. Attune turns a patient's tracked symptoms, portal notes and labs into one referral packet. It finds an in-network OB/GYN with an open time, gets the PCP office to sign off, sends the packet the way each office already receives referrals, and follows up until the visit happens. A person approves every step.</p>
+        <p class="overline">A patient-owned record for PMOS</p>
+        <h1 id="hero-h">A cancelled visit, filled by someone who's ready.</h1>
+        <p class="lede">PMOS is the new name for PCOS. Attune is a record she owns and shares with her PCP, gyno and endo, so she stops retelling her story at every visit. When a specialist has a cancellation, Attune offers the time to a patient who is already referred by her PCP, complete for that practice's criteria, insurance-checked, and has her record on one page. People approve every step.</p>
         <div class="hero-cta">
-          <a class="btn btn-light" href="demo/">Try the demo <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn-outline-light" href="guide/">Read the patient walkthrough</a>
+          <a class="btn btn-light" href="demo/">Open the demo <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-outline-light" href="#fill">How the fill works</a>
         </div>
       </div>
 
-      <figure class="record" aria-labelledby="record-cap">
-        <div class="record-head">
-          <div>
-            <div class="record-id mono">REF MK-2291</div>
-            <div class="record-title">Referral · PCP to OB/GYN</div>
+      <figure class="offer" aria-labelledby="offer-cap">
+        <div class="paper-lift">
+          <div class="paper grain">
+            <p class="overline">A time opened up</p>
+            <p class="offer-when">Thursday, 2:40 PM</p>
+            <p class="offer-where">Endocrinology · In person · 5 miles away</p>
+            <div class="offer-timer"><b class="tnum">14:52</b><span>left on your hold</span></div>
+            <div class="bar" aria-hidden="true"><i></i></div>
+            <p class="offer-consent">Tapping Accept shares your Patient Pack with this office. They see nothing about you before then.</p>
+            <div class="offer-actions" aria-hidden="true"><span class="yes">Accept</span><span class="no">Not this one</span></div>
+            <p class="ink">you're still on the list either way.</p>
           </div>
-          <span class="pill pill-warning"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg> In progress</span>
         </div>
-        <ol class="record-steps">
-          <li class="done"><span class="dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span><div><b>Packet built from tracker, portal and labs</b><span>Attune</span></div></li>
-          <li class="done"><span class="dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span><div><b>Doctor, time and shared items approved</b><span>Patient</span></div></li>
-          <li class="done"><span class="dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span><div><b>Codes confirmed and referral signed</b><span>PCP office</span></div></li>
-          <li class="done"><span class="dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span><div><b>Delivered by verified e-fax, receipt logged</b><span>Attune</span></div></li>
-          <li class="now"><span class="dot"></span><div><b>Confirm requested time <span class="mono">Nov 12, 2:40 PM</span></b><span>OB/GYN front desk</span></div></li>
-        </ol>
-        <figcaption id="record-cap">Synthetic example. Every person and practice in the demo is invented.</figcaption>
+        <figcaption id="offer-cap">Synthetic example. Every person and practice in the demo is invented.</figcaption>
       </figure>
     </section>
+    <div class="band-foot" aria-hidden="true"></div>
   </div>
 
   <main id="main">
     <section class="wrap gap" aria-labelledby="gap-h">
+      <p class="overline">Discovery</p>
       <h2 id="gap-h">Where referrals break today</h2>
       <p class="section-lede">From 49 discovery interviews with patients, PCP staff, specialist intake staff and OB/GYNs. The patient is the only one who sees the whole handoff.</p>
       <ul class="gap-grid">
-        <li>
-          <p class="who">PCP office</p>
-          <p>The medical assistant pulls notes and labs from separate systems and faxes them by hand. Finding an in-network specialist with a working fax number takes the longest. After the fax, nobody knows what happened.</p>
+        <li class="paper-lift">
+          <div class="paper grain">
+            <p class="overline">PCP office</p>
+            <p>The medical assistant pulls notes and labs from separate systems and faxes them by hand. Finding an in-network specialist with a working fax number takes the longest. After the fax, nobody knows what happened.</p>
+          </div>
         </li>
-        <li>
-          <p class="who">Specialist office</p>
-          <p>Referrals arrive as faxes in the EHR inbox with partial records. Schedulers call the patient, and the provider retakes the history even when notes were sent.</p>
+        <li class="paper-lift">
+          <div class="paper grain">
+            <p class="overline">Specialist office</p>
+            <p>Referrals arrive as faxes in the EHR inbox with partial records. Schedulers call the patient, and the provider retakes the history even when notes were sent.</p>
+          </div>
         </li>
-        <li>
-          <p class="who">Patient</p>
-          <p>She bounces between providers, chases the referral herself and retells her history from memory. Some skip the referral entirely because of insurance or the wait.</p>
+        <li class="paper-lift">
+          <div class="paper grain">
+            <p class="overline">Patient</p>
+            <p>She bounces between providers, chases the referral herself and retells her history from memory. Some skip the referral entirely because of insurance or the wait.</p>
+          </div>
         </li>
       </ul>
     </section>
 
+    <section class="fill" id="fill" aria-labelledby="fill-h">
+      <div class="wrap">
+        <p class="overline">How the fill works</p>
+        <h2 id="fill-h">Eight steps, one record</h2>
+        <p class="section-lede">Steps 1 to 4 build and check the referral. Step 6 fills the cancellation. Step 8 returns the outcome to her record.</p>
+        <div class="fill-grid">
+          <ol class="loop">
+            <li><b>She starts her record.</b><span>Three questions, then a one-minute check-in on mood, sleep, energy and skin.</span></li>
+            <li><b>She shares it with her PCP.</b><span>A share code or QR plus her date of birth. The MA sees what she shared on one page.</span></li>
+            <li><b>The PCP office refers.</b><span>Gyno or endo, a written reason, and a physician signs "I evaluated this patient."</span></li>
+            <li><b>Attune checks it.</b><span>Complete against each practice's published criteria, then insurance from a photo of her card.</span></li>
+            <li><b>She joins the waitlist.</b><span>She sets distance, telehealth yes or no, days and times, and the shortest notice she can handle.</span></li>
+            <li><b>A practice posts a cancellation.</b><span>Attune offers it to ready patients with a countdown. The first to accept gets it; the others hear "That slot just filled. You're still on the list."</span></li>
+            <li><b>The front desk opens her Patient Pack.</b><span>Her story in her own words, the referral note, labs, check-in trends, meds and insurance. She confirms nothing has changed the day before.</span></li>
+            <li><b>The summary comes back.</b><span>The specialist uploads a visit summary. It lands in her record and her PCP's inbox, and the referral closes.</span></li>
+          </ol>
+          <div class="side">
+            <div class="panel-card">
+              <h3>Who gets an offer</h3>
+              <ul class="checks">
+                <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span>Her referral is PCP-signed and complete for that practice's criteria.</span></li>
+                <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span>Insurance was checked in the last 24 hours, and the practice accepts her plan.</span></li>
+                <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span>Same specialty, within her distance, or telehealth if she said yes.</span></li>
+                <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span>Inside her days and times, and no sooner than her shortest notice.</span></li>
+                <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span>No other offer is already waiting for her.</span></li>
+              </ul>
+              <h3 class="sub">In this order</h3>
+              <ol class="order">
+                <li>The PCP's urgency flag</li>
+                <li>Longest on the waitlist</li>
+                <li>Nearest</li>
+              </ol>
+              <p class="never">Never by who pays, by payer or by plan type. Practices never see the queue or pick patients. Their only lever is the criteria they publish.</p>
+            </div>
+            <div class="panel-card">
+              <h3>How long a hold lasts</h3>
+              <div class="table-scroll">
+                <table class="holds">
+                  <thead><tr><th scope="col">Visit starts in</th><th scope="col">Hold</th><th scope="col">Offered at once</th></tr></thead>
+                  <tbody>
+                    <tr><td>More than 48 hours</td><td>2 hours</td><td>1</td></tr>
+                    <tr><td>24 to 48 hours</td><td>1 hour</td><td>1</td></tr>
+                    <tr><td>4 to 24 hours</td><td>15 minutes</td><td>2</td></tr>
+                    <tr><td>Under 4 hours</td><td>5 minutes</td><td>3</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="note">Starting defaults. If nobody accepts, the opening closes as unfilled and the practice sees why, as counts only. Nobody is promised a date or a place in line.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="views" id="views" aria-labelledby="views-h">
       <div class="wrap">
-        <h2 id="views-h">One shared referral record, three views</h2>
-        <p class="section-lede">Each person sees the same referral and the one step that is theirs to take.</p>
+        <p class="overline">Views</p>
+        <h2 id="views-h">One shared record, three views</h2>
+        <p class="section-lede">Each person sees the same record, only what she shared with them, and the one step that is theirs to take.</p>
 
         <nav class="tabs" aria-label="Choose a view">
           <a class="tab" id="tab-patients" href="#patients">Patients</a>
@@ -100,82 +160,81 @@
 
         <section class="panel" id="patients" aria-labelledby="patients-h">
           <div class="panel-copy">
-            <p class="overline overline-dark">For patients</p>
-            <h3 id="patients-h">Book a specialist the way you book any appointment. Your PCP signs off behind the scenes.</h3>
+            <p class="overline">For patients</p>
+            <h3 id="patients-h">Her record, shared on her terms. A minute a day, then it ends.</h3>
             <ul class="points">
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Pick a doctor and a time.</b> In-network OB/GYNs with real openings, distance and PMOS experience on each card. Tap a time to hold it.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Choose what's shared.</b> Tracker summary, photo trend, portal notes, labs, uploads. Preview the exact packet the doctor gets.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>No chasing.</b> Your PCP office signs, Attune sends it with a receipt, and the office confirms your held time. You see each step as it happens.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Stop sharing any time.</b> Before it's sent, the request is pulled back. After, nothing further is shared.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Three questions, then a one-minute check-in.</b> Home ends with "You're caught up." No red dots, no badges, no endless feed.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Share by section, with each office.</b> Turn any section off for any office at any time, and see who viewed her record and when.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Offers instead of phone tag.</b> When a time opens that fits her preferences, she gets it with a countdown. Accepting is her consent to share her Patient Pack with that office.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>No health details in texts.</b> A notification only says a time opened. Everything else stays in the app.</span></li>
             </ul>
             <div class="panel-cta">
               <a class="btn btn-primary" href="patient/">Open the patient app</a>
-              <a class="btn btn-secondary" href="guide/">Patient walkthrough</a>
             </div>
           </div>
           <div class="flow" aria-label="Who acts at each step, patient view">
             <p class="flow-title">Who does what</p>
             <ol>
-              <li><span class="role role-you">You</span>Pick a doctor and hold a time</li>
-              <li><span class="role role-you">You</span>Choose what's shared and approve</li>
-              <li><span class="role">PCP office</span>Confirms codes and signs</li>
-              <li><span class="role role-agent">Attune</span>Sends the packet, logs the receipt</li>
-              <li><span class="role">OB/GYN office</span>Confirms your time</li>
-              <li><span class="role role-agent">Attune</span>Updates your PCP after the visit</li>
+              <li><span class="role role-you">You</span>Start your record and check in</li>
+              <li><span class="role role-you">You</span>Share it with your PCP</li>
+              <li><span class="role">PCP office</span>Refers you and signs</li>
+              <li><span class="role role-agent">Attune</span>Checks criteria and insurance</li>
+              <li><span class="role role-you">You</span>Accept an offer</li>
+              <li><span class="role">Specialist</span>Sends your visit summary back</li>
             </ol>
           </div>
         </section>
 
         <section class="panel" id="pcp" aria-labelledby="pcp-h">
           <div class="panel-copy">
-            <p class="overline overline-dark">For PCP offices</p>
-            <h3 id="pcp-h">A referral that arrives pre-filled. Check it, sign once, and see what happens after the fax.</h3>
+            <p class="overline">For PCP offices</p>
+            <h3 id="pcp-h">Look her up, refer in one place, and see what happens after.</h3>
             <ul class="points">
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Pre-filled packet.</b> Reason, the patient-approved records with their sources, and draft ICD-10 symptom codes for the MA to confirm.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>No specialist hunting.</b> The patient's chosen in-network OB/GYN, with a verified fax or Direct address and NPI.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Sign once.</b> The MA signs. A physician co-signs when the plan requires it (HMO and POS by default). Attune never signs.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Status after sending.</b> Received, booked and seen come back to you. Export the packet as a PDF into Tebra or any EMR. Web, no install.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>One page per patient.</b> Enter her share code and date of birth to see what she shared, and only that.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Gyno or endo, and a reason.</b> A live check shows what each practice requires. Attaching results from your EMR is mocked in the prototype.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>A physician signs.</b> "I evaluated this patient." The PCP decides who qualifies; Attune never signs.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Status board and inbox.</b> Every referral's status, and visit summaries come back to your inbox. For practices not on Attune, the prototype shows the fax or Direct packet that would go out and sends nothing.</span></li>
             </ul>
             <div class="panel-cta">
-              <a class="btn btn-primary" href="pcp/">Open PCP admin</a>
+              <a class="btn btn-primary" href="pcp/">Open the PCP portal</a>
             </div>
           </div>
           <div class="flow" aria-label="Who acts at each step, PCP view">
             <p class="flow-title">Who does what</p>
             <ol>
-              <li><span class="role">Patient</span>Approves the doctor, time and records</li>
-              <li><span class="role role-agent">Attune</span>Drafts the packet and codes</li>
-              <li><span class="role role-you">Your MA</span>Confirms codes and signs</li>
-              <li><span class="role role-you">Physician</span>Co-signs where the plan requires</li>
-              <li><span class="role role-agent">Attune</span>Delivers with a receipt</li>
-              <li><span class="role role-agent">Attune</span>Reports received, booked, seen</li>
+              <li><span class="role">Patient</span>Shares her record with you</li>
+              <li><span class="role role-you">Your MA</span>Looks her up and prepares the referral</li>
+              <li><span class="role role-you">Physician</span>Signs "I evaluated this patient"</li>
+              <li><span class="role role-agent">Attune</span>Checks criteria and insurance</li>
+              <li><span class="role">Specialist</span>Sees her from the waitlist</li>
+              <li><span class="role role-agent">Attune</span>Delivers the summary to your inbox</li>
             </ol>
           </div>
         </section>
 
         <section class="panel" id="specialists" aria-labelledby="specialists-h">
           <div class="panel-copy">
-            <p class="overline overline-dark">For specialist offices</p>
-            <h3 id="specialists-h">New patients who arrive pre-qualified, with a time already requested.</h3>
+            <p class="overline">For specialist offices</p>
+            <h3 id="specialists-h">Post a cancellation. A patient who's ready takes it.</h3>
             <ul class="points">
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Pre-qualified.</b> Plan and network checked, PCP signed, packet attached before it reaches your inbox.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Evidence with sources.</b> Cycle history, hirsutism trend and labs on one page, each item labelled with where it came from. Decision support, not a diagnosis.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Confirm in one click.</b> Confirm the patient's requested time, offer another, ask for more records, or decline with a note.</span></li>
-              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Fits your intake.</b> Arrives by verified e-fax or Direct (360X), so it still lands in athena or Epic. Cancellation fill offers an open slot to the next referred patient whose record is ready.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Post an opening.</b> Provider, time, in person or telehealth. Before you post, you see how long the hold runs and how many patients get it.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Ready patients only.</b> Everyone offered is PCP-signed, complete for the criteria you publish, and insurance-checked. You can't see the queue or pick patients.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>The Patient Pack.</b> Once she accepts: her story, the referral note, labs, check-in trends, meds and insurance on one page, each with its source. Print it to PDF. Display only.</span></li>
+              <li><svg class="ic ok" aria-hidden="true"><use href="#i-check"/></svg><span><b>Close the loop.</b> Mark the visit attended and send a summary to her record and her PCP. Unfilled openings say why, as counts only.</span></li>
             </ul>
             <div class="panel-cta">
-              <a class="btn btn-primary" href="specialist/">Open specialist admin</a>
+              <a class="btn btn-primary" href="specialist/">Open the specialist portal</a>
             </div>
           </div>
           <div class="flow" aria-label="Who acts at each step, specialist view">
             <p class="flow-title">Who does what</p>
             <ol>
-              <li><span class="role">PCP office</span>Signs the referral</li>
-              <li><span class="role role-agent">Attune</span>Delivers by e-fax or Direct</li>
-              <li><span class="role role-you">Front desk</span>Confirms the requested time</li>
-              <li><span class="role">Patient</span>Arrives with her history on file</li>
-              <li><span class="role role-you">Provider</span>Records the visit outcome</li>
-              <li><span class="role role-agent">Attune</span>Sends the outcome to the PCP</li>
+              <li><span class="role role-you">Front desk</span>Posts a cancellation</li>
+              <li><span class="role role-agent">Attune</span>Offers it to ready patients</li>
+              <li><span class="role">Patient</span>Accepts before the hold ends</li>
+              <li><span class="role role-you">Front desk</span>Opens her Patient Pack</li>
+              <li><span class="role">Patient</span>Confirms the day before</li>
+              <li><span class="role role-you">Provider</span>Sends the visit summary</li>
             </ol>
           </div>
         </section>
@@ -183,13 +242,16 @@
     </section>
 
     <section class="wrap rules" id="rules" aria-labelledby="rules-h">
+      <p class="overline">Rules</p>
       <h2 id="rules-h">Rules Attune follows</h2>
-      <p class="section-lede">These are enforced in the referral rules and covered by tests, not just written down.</p>
+      <p class="section-lede">These are built into the shared record's rules and covered by tests, not only written down.</p>
       <ul class="rules-grid">
-        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>The patient approves every share.</b><span>Nothing leaves Attune until she approves what goes and to whom.</span></li>
-        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>Nothing is sent before the PCP office signs.</b><span>The MA signs every referral, and a physician signs where the plan requires it. The agent never signs.</span></li>
-        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>Matches are never ranked by who pays.</b><span>Ranking uses network, soonest opening, PMOS experience and distance only, and includes specialists who don't work with Attune.</span></li>
-        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>Decision support, never a diagnosis.</b><span>Evidence is mapped to criteria with its source. Codes are drafts until the PCP office confirms them.</span></li>
+        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>She approves every share.</b><span>Consent is per section and per office, can be withdrawn, and is logged. She sees who viewed her record. An office may keep what it already received.</span></li>
+        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>Accepting is consent.</b><span>A practice sees nothing about her until she accepts its opening. Then it gets her Patient Pack.</span></li>
+        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>A physician signs every referral.</b><span>The PCP decides who qualifies for a referral. Attune never signs.</span></li>
+        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>Never ranked by who pays.</b><span>Offers follow the PCP's urgency flag, time on the waitlist and distance. Fees, payer and plan type never enter the order.</span></li>
+        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>Display only, never a diagnosis.</b><span>Attune doesn't name conditions, score severity or recommend treatment. Every item shows where it came from.</span></li>
+        <li><svg class="ic rule-ic" aria-hidden="true"><use href="#i-shield"/></svg><b>No health details in texts.</b><span>Notifications say only that a time opened, and fit in one text message.</span></li>
       </ul>
     </section>
 
@@ -198,7 +260,9 @@
         <svg class="ic" aria-hidden="true"><use href="#i-info"/></svg>
         <div>
           <h2 id="status-h">Where Attune is today</h2>
-          <p>Attune is an early demo with synthetic data. Nothing in it is sent to a real office. The first loop is PCP to OB/GYN in Dallas–Fort Worth; endocrinology and fertility referrals come later. Attune is not a medical device and does not diagnose or treat any condition.</p>
+          <p>Attune is a prototype with synthetic data, not for real patients. Matching, offers, hold timers and statuses run on real rules. Insurance checks, the provider directory and EMR connections are mocked, and nothing is sent to a real office.</p>
+          <p>The prototype shows a fee ledger for specialist practices and charges nothing. No fee will be billed before a healthcare attorney reviews it. PCPs and patients pay nothing for the referral loop. Attune does not diagnose or treat any condition.</p>
+          <a class="btn btn-primary" href="demo/">Open the demo</a>
         </div>
       </div>
     </section>
@@ -209,7 +273,7 @@
       <span>© 2026 Attune</span>
       <nav aria-label="Footer">
         <a href="demo/">Demo</a>
-        <a href="guide/">Patient walkthrough</a>
+        <a href="patient/">Patient app</a>
         <a href="https://github.com/Hanzalar/attune">Source on GitHub</a>
       </nav>
     </div>
