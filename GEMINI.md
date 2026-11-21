@@ -1,6 +1,6 @@
 <!-- CONSTITUTION:START -->
 Generated from https://github.com/Hanzalar/attune/tree/meta/governance.
-Source SHA-256: `c2542066760117871f6fb341f5deb085cb87762c326bd8ef078da6d319126323`.
+Source SHA-256: `577080a22b334891250cb0a4e270f75e025ef1c785bc9454d2ab767b06217d1c`.
 Edit canonical sources in specs repo; regenerate this managed block.
 
 [Notice: Specifications Checkout]
@@ -13,11 +13,12 @@ Explicit user instructions and higher-priority platform safety instructions take
 
 ## 1. Where Things Live
 
-- One repository, `https://github.com/Hanzalar/attune`, with three kinds of branches that never merge into each other:
+- One repository, `https://github.com/Hanzalar/attune`, with four kinds of branches that never merge into each other:
   - `business` (orphan): product brief, de-identified discovery notes, competitor landscape, pricing and legal options, ADRs. This is business intent.
   - `meta` (orphan): this constitution, agent adapters, component rules, OpenSpec specs and changes, handoffs, release reports.
+  - `landing` (orphan): the public marketing page, static files only. The Pages build on `develop` overlays it on the site root; it may claim only what the product does today.
   - `develop`, `stage`, `main`: application code only.
-- Open them side by side with worktrees: `git worktree add ../attune-meta meta` and `git worktree add ../attune-business business`.
+- Open them side by side with worktrees: `git worktree add ../attune-meta meta`, `git worktree add ../attune-business business` and `git worktree add ../attune-landing landing`.
 - Do not copy specs or business docs into code branches. Link to them.
 - Treat the business branch as intent and the prototype as reference. Neither is proof that something is ready.
 
@@ -55,16 +56,17 @@ Explicit user instructions and higher-priority platform safety instructions take
 
 Attune is a patient-owned referral agent for PMOS (formerly PCOS). It drafts; people approve.
 
-1. **The patient owns the record.** Nothing leaves Attune without the patient's approval of what is shared and with whom. Revoking consent before sending pulls the request back; after sending, nothing further is shared.
-2. **No referral without the PCP office.** The PCP's MA signs off on every referral; a physician signs where the plan requires it (HMO, POS by default). The agent never signs.
-3. **Never rank by who pays.** Matching code must not read `partner`, fees, or any commercial field. Ranking uses network, soonest opening, PMOS experience and distance only, and shows non-partner specialists. A test enforces this; keep it.
-4. **Decision support, never diagnosis.** Map evidence to criteria with the source of every item. Never output "diagnosed", "you have PMOS", or treatment orders. Code symptoms, not suspected conditions; E28.2 only when the diagnosis is already on file. Codes are drafts until the MA confirms them.
+1. **The patient owns the record.** Nothing leaves Attune without the patient's approval of what is shared and with whom. Consent is per section and per recipient, revocable and logged, and she can see who viewed her record. Accepting an offer is her consent to share the Patient Pack with that practice; the practice sees nothing about her before then. Revoking stops further sharing; what was already delivered stays with the recipient.
+2. **No referral without the PCP office.** The PCP office prepares every referral and a physician signs "I evaluated this patient". The PCP decides who is qualified. The agent never signs.
+3. **Never rank by who pays.** Matching code must not read fees, payer or any commercial field. Offers go only to eligible waitlisted patients, ordered by the PCP urgency flag, then longest wait, then distance. Practices never see the queue or pick patients; their only lever is the criteria they publish. A test enforces this; keep it.
+4. **Display only, never diagnosis.** Never name a condition for her, score severity or recommend treatment. Every item shows its source. Completeness checks compare paperwork to a practice's published criteria; they never judge her health. Bringing back evidence mapping or code drafting needs an ADR and the FDA clinical-decision-support check.
 5. **Fit the office as it works today.** v1 delivers by verified e-fax or Direct (360X package); v2 is a SMART on FHIR read app; v3 write-back needs a per-vendor ADR. A fax that lands in Athena still counts.
 6. **Standards-shaped from day one.** Model referrals as HL7 BSeR ServiceRequest + Task with a FHIR Consent. Pull records only on the patient's authority ((g)(10) patient APIs, then TEFCA Individual Access Services). Never use treatment-purpose aggregator access for a patient app.
 7. **No PHI in this repository.** The repo is public. Demo data is synthetic and labelled. No real patient or interviewee names, health details, screenshots of real records, or paid reports in any branch. Logs never contain health data.
 8. **Every state change is audited.** Each command appends an event naming the actor and what was shared. The log is append-only.
-9. **Regulatory gates come first.** No specialist-paid fee before the attorney review recorded on `business` (OIG AO 26-15, Texas Occ. Code 102.001). No clinician-facing launch before the FDA clinical-decision-support check. Record the outcome as an ADR.
+9. **Regulatory gates come first.** No specialist-paid fee is billed before the attorney review recorded on `business` (OIG AO 26-15, Texas Occ. Code 102.001); until then the fee ledger accrues and charges nothing, and no field pays a PCP or a patient. No clinician-facing launch before the FDA clinical-decision-support check. Record the outcome as an ADR.
 10. **Web first, mobile-first patient app.** Ship as one web build: patient app (installable PWA), PCP admin, specialist admin. A native shell may wrap the patient app later and reuses `packages/domain`; no native-only product features without an ADR.
 11. **Build only what discovery supports.** Every capability links to a de-identified note on `business`.
 12. **No tech debt by default.** No `any`, no dead code, no hardcoded URLs or keys, no file over 400 lines without a written reason in the handoff.
+13. **Assistants suggest; she approves.** Attune has no chatbot of its own. An AI assistant she connects (Claude, ChatGPT or any MCP client) is a consent recipient like a practice: it reaches her record only through Attune's connector, reads only the sections she grants, every read is logged where she can see it, and anything it writes is a suggestion she applies or dismisses. Assistants never diagnose, interpret results or advise treatment. Real data needs connector OAuth, a server-side record store and a review of each assistant vendor's health-data terms first.
 <!-- CONSTITUTION:END -->
