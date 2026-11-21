@@ -141,7 +141,11 @@ function waiting(id: string, patientId: string, pcpId: string, specialty: Specia
   };
 }
 
-/** The rest of the queue: other patients who make the matching real. None has the app; staff see only refs. */
+/**
+ * The rest of the queue: other patients who make the matching real. None has the app; staff see only refs.
+ * Each fails exactly one rule for a cancellation posted in the next few days, on any day of the week, so the demo's
+ * offer reaches Ari (SW-8842 needs four days' notice; the form's default slot is never further out than that).
+ */
 function background(now: string, mode: "fresh" | "fill"): { patients: Patient[]; referrals: Referral[] } {
   const ins = (planId: string, verifiedAt: string | null, issue: string | null = null) => ({ planId, memberIdLast4: "0000", cardCapturedAt: ago(now, 20), verifiedAt, issue });
   const fresh = ago(now, 0, 2);
@@ -153,7 +157,7 @@ function background(now: string, mode: "fresh" | "fill"): { patients: Patient[];
     person({ id: "p-hb", ref: "HB-2204", name: "H. B. (example)", firstName: "H.", pcpId: "cedar" }),
     person({ id: "p-kt", ref: "KT-7740", name: "K. T. (example)", firstName: "K.", pcpId: "oaklawn", results: std, insurance: ins("lonestar-ppo", ago(now, 3)) }),
     person({ id: "p-mo", ref: "MO-2218", name: "M. O. (example)", firstName: "M.", pcpId: "oaklawn", results: std, insurance: ins("gulf-hmo", fresh) }),
-    person({ id: "p-sw", ref: "SW-8842", name: "S. W. (example)", firstName: "S.", pcpId: "oaklawn", results: std, insurance: ins("prairie-epo", fresh), prefs: { ...PREFS, minNoticeHours: 48 } }),
+    person({ id: "p-sw", ref: "SW-8842", name: "S. W. (example)", firstName: "S.", pcpId: "oaklawn", results: std, insurance: ins("prairie-epo", fresh), prefs: { ...PREFS, minNoticeHours: 96 } }),
     person({ id: "p-lp", ref: "LP-5530", name: "L. P. (example)", firstName: "L.", pcpId: "oaklawn", insurance: ins("pecan-pos", null, "Card photo is blurry; the member ID can't be read.") }),
   ];
   const referrals = [
