@@ -1,15 +1,17 @@
 <!-- CONSTITUTION:START -->
 Generated from https://github.com/Hanzalar/attune/tree/meta/governance.
-Source SHA-256: `c2542066760117871f6fb341f5deb085cb87762c326bd8ef078da6d319126323`.
+Source SHA-256: `577080a22b334891250cb0a4e270f75e025ef1c785bc9454d2ab767b06217d1c`.
 Edit canonical sources in specs repo; regenerate this managed block.
 
-# Component: web (Patient app, PCP admin and specialist admin pages over one shared record)
+# Component: web (Patient app, PCP portal, specialist portal, ops and demo hub over one shared record)
 
 Read the root AGENTS.md and relevant specifications first.
 
-- Views read rules from @attune/domain; do not re-implement stages, codes, ranking or evidence in components.
+- Views read rules and read models from @attune/domain; do not re-implement statuses, eligibility, ordering or consent in components.
 - Go through the store's act(); show the rule's refusal message instead of hiding the control.
-- Patient app is mobile-first: no horizontal scroll at 390px, safe-area insets respected, tap targets at least 22px.
-- Admin views must stay usable at phone width even though they are designed for desktop.
-- Keep files under 400 lines; split by tab or panel.
+- Use the Attune design system (apps/web/DESIGN.md): tokens from src/design/tokens.ts and components from src/shared/ui.tsx; no raw colors, fonts or radii in views, and no status shown by color alone.
+- Patient app is mobile-first: text 14px or larger, no red dots or badges, no infinite scroll, no horizontal scroll at 390px, tap targets at least 44px.
+- Clinician portals stay usable at phone width even though they are designed for desktop.
+- Keep files under 400 lines; split by screen or panel.
+- No in-app chatbot: the patient app shows connections, suggestions waiting for her, and who read what.
 <!-- CONSTITUTION:END -->

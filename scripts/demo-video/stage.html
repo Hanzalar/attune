@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Attune demo stage</title>
+<!--
+  Recording stage for the demo films. Frames the live app (same origin) in a desktop window and a phone, scaled up so
+  the interface reads on a laptop, with titles, captions, a cursor, highlights, a progress bar and a neutral chat
+  panel for the external assistant. Behavior lives in stage.js; record.mjs drives it. Colors and type mirror
+  apps/web/src/design/tokens.ts; this file is plain HTML, so it can't import them.
+-->
+<style>
+  @font-face { font-family: "Instrument Sans"; font-weight: 400; src: url("/fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Instrument Sans"; font-weight: 500; src: url("/fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Instrument Sans"; font-weight: 600; src: url("/fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Instrument Serif"; font-style: italic; src: url("/fonts/instrument-serif-latin-400-italic.woff2") format("woff2"); }
+  :root { --wine:#5A1428; --raspberry:#8E3853; --rose:#AE6679; --clay:#C2A08B; --blush:#F0C9C8; --bone:#F4EBE4; --cream:#FAF4EE; --forest:#2E3A2A; --muted:#5B6355; --hair:#E2D5CA; --sand:#EFE2D6; --sage:#E3E8DC; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bone); color: var(--forest); font-family: "Instrument Sans", sans-serif; -webkit-font-smoothing: antialiased; }
+  .grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .45; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .08  0 0 0 0 .16  0 0 0 .14 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  #bg { position: absolute; inset: 0; background: radial-gradient(38% 30% at 6% 100%, rgba(240,201,200,.85), rgba(240,201,200,0) 70%), radial-gradient(30% 26% at 96% 96%, rgba(174,102,121,.28), rgba(174,102,121,0) 70%), radial-gradient(34% 26% at 100% 0%, rgba(194,160,139,.26), rgba(194,160,139,0) 70%), var(--bone); }
+  .fade { transition: opacity .5s ease, transform .5s ease; }
+  .hidden { opacity: 0 !important; transform: translateY(8px); }
+  #head { position: absolute; left: 100px; top: 50px; width: 1720px; }
+  .overline { font-size: 18px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--raspberry); }
+  .title { font-family: "Instrument Serif", serif; font-style: italic; font-size: 62px; line-height: 1.04; margin-top: 8px; letter-spacing: -.01em; max-width: 1240px; }
+  #step { position: absolute; right: 0; top: 0; font-size: 18px; font-weight: 600; color: var(--raspberry); letter-spacing: .06em; }
+  #caption { position: absolute; left: 100px; top: 962px; width: 1720px; font-size: 30px; line-height: 1.35; text-wrap: balance; }
+  body.narrow #caption { width: 980px; top: 912px; }
+  body.narrow .title { max-width: 980px; }
+  #progress { position: absolute; left: 0; bottom: 0; height: 6px; background: var(--raspberry); width: 0; transition: width .8s ease; z-index: 75; }
+  .frame { position: absolute; opacity: 0; transition: opacity .5s ease; }
+  .frame iframe { display: block; border: 0; background: var(--bone); transform-origin: 0 0; }
+  #desktop { background: var(--cream); border-radius: 16px; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(90,20,40,.35), 0 2px 4px rgba(46,58,42,.08); }
+  #desktop .bar { height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 18px; border-bottom: 1px solid var(--hair); font-size: 18px; color: var(--muted); }
+  #desktop .dot { width: 11px; height: 11px; border-radius: 6px; background: var(--hair); }
+  #desktop .clip { overflow: hidden; position: relative; }
+  #phone { background: #FBF6F1; border-radius: 56px; padding: 13px; box-shadow: 0 40px 70px -34px rgba(90,20,40,.45), 0 0 0 1px rgba(194,160,139,.35); }
+  #phone .clip { overflow: hidden; border-radius: 44px; position: relative; }
+  #points { position: absolute; left: 100px; top: 290px; width: 980px; }
+  #points div { font-family: "Instrument Serif", serif; font-style: italic; font-size: 46px; line-height: 1.15; margin-bottom: 30px; opacity: 0; transform: translateY(8px); transition: all .6s ease; padding-left: 34px; text-indent: -34px; }
+  #points div.on { opacity: 1; transform: none; }
+  #points div::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 7px; background: var(--rose); margin-right: 20px; vertical-align: middle; }
+  #chat { background: var(--cream); border-radius: 22px; box-shadow: 0 30px 60px -30px rgba(46,58,42,.4), 0 0 0 1px rgba(194,160,139,.3); display: flex; flex-direction: column; overflow: hidden; }
+  #chat .top { padding: 18px 24px; border-bottom: 1px solid var(--hair); display: flex; align-items: center; gap: 14px; }
+  #chat .av { width: 40px; height: 40px; border-radius: 20px; background: var(--forest); position: relative; flex-shrink: 0; }
+  #chat .av::after { content: ""; position: absolute; inset: 13px; border-radius: 7px; background: var(--cream); }
+  #chat .name { font-size: 22px; font-weight: 600; }
+  #chat .note { font-size: 16px; color: var(--muted); }
+  #chat .body { flex: 1; overflow: hidden; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; justify-content: flex-end; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px); mask-image: linear-gradient(to bottom, transparent 0, #000 56px); }
+  #chat .msg { font-size: 23px; line-height: 1.42; max-width: 84%; opacity: 0; transform: translateY(6px); transition: all .35s ease; }
+  #chat .msg.on { opacity: 1; transform: none; }
+  #chat .msg.user { align-self: flex-end; background: var(--forest); color: var(--cream); padding: 14px 20px; border-radius: 20px 20px 6px 20px; }
+  #chat .msg.ai { align-self: flex-start; }
+  #chat .tool { align-self: flex-start; font-size: 18px; background: var(--sand); color: #6E4E36; padding: 8px 14px; border-radius: 10px; opacity: 0; transition: opacity .35s ease, background .35s ease; }
+  #chat .tool.on { opacity: 1; }
+  #chat .tool b { font-weight: 600; }
+  #chat .tool.done { background: var(--sage); color: var(--forest); }
+  #chat .foot { padding: 16px 22px; border-top: 1px solid var(--hair); display: flex; gap: 12px; align-items: center; }
+  #chat .input { flex: 1; min-height: 52px; border: 1px solid #8F7E72; border-radius: 26px; padding: 12px 20px; font-size: 22px; color: var(--forest); box-sizing: border-box; background: #fff; line-height: 1.3; }
+  #chat .input.empty { color: #8F7E72; }
+  #chat .send { width: 52px; height: 52px; border-radius: 26px; background: var(--forest); flex-shrink: 0; position: relative; }
+  #chat .send::after { content: ""; position: absolute; left: 20px; top: 15px; border-left: 16px solid var(--cream); border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+  #cursor { position: absolute; left: 0; top: 0; width: 36px; height: 36px; z-index: 90; transition: transform .8s cubic-bezier(.22,.8,.2,1), opacity .4s; opacity: 0; pointer-events: none; }
+  .ripple { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; border: 3px solid var(--raspberry); z-index: 89; pointer-events: none; animation: rip .6s ease-out forwards; }
+  @keyframes rip { from { transform: scale(.4); opacity: .9; } to { transform: scale(2.6); opacity: 0; } }
+  #spot { position: absolute; z-index: 60; border: 3px solid var(--raspberry); border-radius: 14px; box-shadow: 0 0 0 9px rgba(240,201,200,.65), 0 0 0 4000px rgba(46,58,42,.16); opacity: 0; transition: all .45s ease; pointer-events: none; }
+  #card { position: absolute; inset: 0; z-index: 80; display: flex; flex-direction: column; justify-content: center; padding: 0 170px; color: var(--cream); transition: opacity .7s ease; opacity: 0; pointer-events: none;
+    background: radial-gradient(36% 30% at 88% 20%, rgba(142,56,83,.6), rgba(142,56,83,0) 70%), radial-gradient(40% 32% at 10% 96%, rgba(240,201,200,.5), rgba(240,201,200,0) 70%), radial-gradient(30% 24% at 74% 100%, rgba(194,160,139,.45), rgba(194,160,139,0) 70%), var(--wine); }
+  #card .mark { display: flex; align-items: center; gap: 14px; font-family: "Instrument Serif", serif; font-style: italic; font-size: 42px; }
+  #card .kicker { font-size: 20px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--blush); margin-top: 56px; }
+  #card .big { font-family: "Instrument Serif", serif; font-style: italic; font-size: 100px; line-height: 1.02; margin-top: 18px; max-width: 1500px; letter-spacing: -.015em; }
+  #card .sub { font-size: 32px; color: var(--blush); margin-top: 28px; max-width: 1350px; line-height: 1.4; }
+  #card .lines { margin-top: 34px; font-size: 30px; line-height: 1.75; }
+  #card .lines div::before { content: "✓"; color: var(--blush); margin-right: 18px; }
+  #card .meta { margin-top: 44px; font-size: 20px; color: var(--blush); letter-spacing: .04em; }
+  #badge { position: absolute; right: 100px; bottom: 18px; font-size: 16px; color: var(--muted); z-index: 70; }
+</style>
+</head>
+<body>
+<div id="bg" class="grain"></div>
+<div id="head" class="fade hidden"><div class="overline" id="overline"></div><div class="title" id="title"></div><div id="step"></div></div>
+<div id="desktop" class="frame"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span id="dlabel"></span></div><div class="clip"><iframe id="dframe" title="desktop"></iframe></div></div>
+<div id="phone" class="frame"><div class="clip"><iframe id="pframe" title="phone"></iframe></div></div>
+<div id="chat" class="frame"><div class="top"><div class="av"></div><div><div class="name">Your AI assistant</div><div class="note" id="chatnote"></div></div></div><div class="body" id="chatbody"></div><div class="foot"><div class="input empty" id="chatinput">Message your assistant…</div><div class="send"></div></div></div>
+<div id="points"></div>
+<div id="caption" class="fade hidden"></div>
+<div id="spot"></div>
+<div id="progress"></div>
+<svg id="cursor" viewBox="0 0 30 30"><path d="M5 3 L5 24 L10.5 18.8 L14.6 27.5 L18.4 25.8 L14.4 17.3 L22 17.3 Z" fill="#2E3A2A" stroke="#FAF4EE" stroke-width="1.8" stroke-linejoin="round"/></svg>
+<div id="card"><div class="mark"><svg width="54" height="54" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#FAF4EE"/><g transform="translate(16 16.5)" fill="#AE6679"><ellipse cx="0" cy="-6" rx="3.6" ry="6"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(72)"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(144)"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(216)"/><ellipse cx="0" cy="-6" rx="3.6" ry="6" transform="rotate(288)"/></g><circle cx="16" cy="16.5" r="2.6" fill="#FAF4EE"/></svg>Attune</div><div class="kicker" id="ckicker"></div><div class="big" id="cbig"></div><div class="sub" id="csub"></div><div class="lines" id="clines"></div><div class="meta" id="cmeta"></div></div>
+<div id="badge">Prototype · synthetic data</div>
+<iframe id="ctl" title="controls" style="position:absolute;left:-4000px;top:0;width:1200px;height:900px;border:0"></iframe>
+<script src="/stage/stage.js"></script>
+</body>
+</html>
