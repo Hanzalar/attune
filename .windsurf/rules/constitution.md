@@ -4,7 +4,7 @@ trigger: always_on
 
 <!-- CONSTITUTION:START -->
 Generated from https://github.com/Hanzalar/attune/tree/meta/governance.
-Source SHA-256: `0417ada0d96d6d34a9e4839a11d57fba5163667b0e1e7e2917eb6bfe0b9fa036`.
+Source SHA-256: `577080a22b334891250cb0a4e270f75e025ef1c785bc9454d2ab767b06217d1c`.
 Edit canonical sources in specs repo; regenerate this managed block.
 
 [Notice: Implementation Checkout]
@@ -72,5 +72,5 @@ Attune is a patient-owned referral agent for PMOS (formerly PCOS). It drafts; pe
 10. **Web first, mobile-first patient app.** Ship as one web build: patient app (installable PWA), PCP admin, specialist admin. A native shell may wrap the patient app later and reuses `packages/domain`; no native-only product features without an ADR.
 11. **Build only what discovery supports.** Every capability links to a de-identified note on `business`.
 12. **No tech debt by default.** No `any`, no dead code, no hardcoded URLs or keys, no file over 400 lines without a written reason in the handoff.
-13. **Assistants draft; she approves.** An AI assistant she connects (Claude, ChatGPT or any MCP client) is a consent recipient like a practice: it reads only the sections she grants, every read is logged where she can see it, and anything it writes is a draft she applies or dismisses. Assistants never diagnose, interpret results or advise treatment. Health data goes to a model provider only through a gateway we host, and real data needs a BAA with that provider first.
+13. **Assistants suggest; she approves.** Attune has no chatbot of its own. An AI assistant she connects (Claude, ChatGPT or any MCP client) is a consent recipient like a practice: it reaches her record only through Attune's connector, reads only the sections she grants, every read is logged where she can see it, and anything it writes is a suggestion she applies or dismisses. Assistants never diagnose, interpret results or advise treatment. Real data needs connector OAuth, a server-side record store and a review of each assistant vendor's health-data terms first.
 <!-- CONSTITUTION:END -->

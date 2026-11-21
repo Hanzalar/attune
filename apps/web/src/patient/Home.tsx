@@ -1,17 +1,17 @@
 /**
- * Home: the one patient home screen. A live offer first (it's time-critical), then the journal composer (the main
- * way in), then her referral, today's check-in and any new summary, and then it ends. One finite page: no feed, no
- * badges, no red dots.
+ * Home: the one patient home screen. A live offer first (it's time-critical), then her AI assistant (updates it
+ * suggested, or how to connect one), then her referral, today's check-in and any new summary, and then it ends.
+ * One finite page: no feed, no badges, no red dots.
  */
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import {
-  DEMO_TZ, MODE, REFERRAL_STATUS, SPECIALTY, nameOf, patientHome, type Patient, type PatientHome, type World,
+  AI_ASSISTANTS, ASSISTANT_SECTIONS, DEMO_TZ, MODE, REFERRAL_STATUS, SPECIALTY, activeLink, assistantInfo, canSee, nameOf, patientHome,
+  type Patient, type PatientHome, type World,
 } from "@attune/domain";
 import { SIZE, T } from "../design/tokens";
 import { daysWaiting, when } from "../shared/format";
 import { Button, Countdown, Ink, Notice, Overline, Paper, StatusPill, Voice, useAct, useToast } from "../shared/ui";
-import { Composer } from "./Composer";
 import { ME, PATIENT_ID, dayNumber, go, greeting, weekdayName } from "./nav";
 import { Body, Screen, Small } from "./Screen";
 
@@ -36,6 +36,39 @@ function OfferCard({ h, now, onAccept }: { h: NonNullable<PatientHome["offer"]>;
         <Button full onClick={onAccept}>Accept this time</Button>
         <Button full variant="secondary" onClick={() => go(`/offer/${h.offer.id}`)}>See details</Button>
       </div>
+    </Card>
+  );
+}
+
+/** Her AI assistant on Home: updates waiting first; otherwise who is connected, or how to connect one. */
+function AssistantCard({ w, patient }: { w: World; patient: Patient }) {
+  const pending = w.proposals.filter((p) => p.patientId === patient.id && p.status === "pending");
+  const connected = AI_ASSISTANTS.filter((a) => activeLink(w, patient.id, a.id));
+  if (pending.length > 0) {
+    const names = [...new Set(pending.map((d) => assistantInfo(d.by)?.name ?? "Your assistant"))].join(" and ");
+    return (
+      <Card overline="From your AI assistant" title={`${pending.length} update${pending.length === 1 ? "" : "s"} to review`} seed={4}>
+        <Body muted>{names} suggested {pending.length === 1 ? "it" : "them"} from what you said. Nothing changes until you apply.</Body>
+        <Button full onClick={() => go("/journal")}>Review updates</Button>
+      </Card>
+    );
+  }
+  if (connected.length > 0) {
+    const a = connected[0];
+    const parts = a ? ASSISTANT_SECTIONS.filter((s) => canSee(w, patient.id, a.id, s)).length : 0;
+    return (
+      <Card overline="Your AI assistant" seed={4}>
+        <Body>{connected.map((c) => c.name).join(" and ")} is connected and reads {parts} part{parts === 1 ? "" : "s"} of your record. Journal or ask there; updates wait for you here.</Body>
+        <a href="#/assistants" className="inline-flex items-center gap-1" style={{ minHeight: 44, fontSize: SIZE.body, color: T.raspberry, fontWeight: 600 }}>
+          Manage what it reads <ArrowRight size={16} aria-hidden />
+        </a>
+      </Card>
+    );
+  }
+  return (
+    <Card overline="Your AI assistant" title="Journal in Claude or ChatGPT" seed={4}>
+      <Body muted>Tell your assistant how you are, or ask about your labs and visits. Attune keeps your record current, and you approve every change.</Body>
+      <Button full variant="secondary" onClick={() => go("/assistants")}>Connect an assistant</Button>
     </Card>
   );
 }
@@ -102,7 +135,7 @@ export function Home({ w, patient, now }: { w: World; patient: Patient; now: str
       }
     >
       {h.offer && <OfferCard h={h.offer} now={now} onAccept={accept} />}
-      <Composer w={w} onHome />
+      <AssistantCard w={w} patient={patient} />
       <ReferralCard w={w} h={h} patient={patient} now={now} />
       {!h.checkedInToday ? (
         <Card overline="Check-in · about a minute" title="How are you, really?" seed={6}>

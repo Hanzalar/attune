@@ -1,6 +1,6 @@
 /**
  * The connector over real HTTP: start the gateway, push a record the way the app does, and drive it with the official
- * MCP client, as Claude or ChatGPT would. No Claude credentials are needed: the connector never calls a model.
+ * MCP client, as Claude or ChatGPT would. No model is involved: the assistant on the other end does the talking.
  */
 import { spawn, type ChildProcess } from "node:child_process";
 import { request } from "node:http";
@@ -34,7 +34,7 @@ const text = (r: unknown) => ((r as { content: { text: string }[] }).content[0]?
 const inbox = async () => ((await (await fetch(`${BASE}/api/hub/inbox`)).json()) as { items: { id: string; command: Command }[] }).items;
 
 beforeAll(async () => {
-  gateway = spawn("npx", ["tsx", "apps/assistant/src/server.ts"], { cwd: root, env: { ...process.env, PORT: String(PORT), ANTHROPIC_API_KEY: "" } });
+  gateway = spawn("npx", ["tsx", "apps/assistant/src/server.ts"], { cwd: root, env: { ...process.env, PORT: String(PORT) } });
   await new Promise<void>((resolve, reject) => {
     gateway.stdout?.on("data", (d: Buffer) => d.toString().includes("gateway on") && resolve());
     gateway.on("exit", (code) => reject(new Error(`gateway exited ${code}`)));
@@ -76,7 +76,7 @@ describe("MCP connector", () => {
     ];
     expect(text(await c.callTool({ name: "suggest_record_updates", arguments: { drafts } }))).toMatch(/Sent 1 draft.*1 skipped: Metformin isn't on her list/);
     const types = (await inbox()).map((i) => i.command.type);
-    expect(types).toEqual(expect.arrayContaining(["writeJournal", "assistantReply"]));
+    expect(types).toEqual(expect.arrayContaining(["writeJournal", "suggestUpdates"]));
     await c.close();
   });
 
@@ -86,11 +86,5 @@ describe("MCP connector", () => {
       request(`${BASE}/api/hub/inbox`, { headers: { host: "attune.example-tunnel.dev" } }, (res) => resolve(res.statusCode ?? 0)).end();
     });
     expect(status).toBe(403);
-  });
-
-  it("reports Claude as not ready, with a fix, when the gateway has no credentials", async () => {
-    const health = (await (await fetch(`${BASE}/api/assistant/health`)).json()) as { ready: boolean; reason: string };
-    expect(health.ready).toBe(false);
-    expect(health.reason).toMatch(/ant auth login|ANTHROPIC_API_KEY|credentials/);
   });
 });

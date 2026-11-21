@@ -79,7 +79,7 @@ export function connectorServer(token: string): McpServer {
       const problems = proposals.map((p) => proposalProblem(p.proposal, patient?.meds ?? [])).filter((x): x is string => x !== null);
       const kept = proposals.filter((p) => proposalProblem(p.proposal, patient?.meds ?? []) === null);
       if (kept.length) {
-        hub.enqueue({ by: "assistant", who: r.who, type: "assistantReply", patientId: r.link.patientId, assistantId: r.link.assistantId, entryId: null, reply: "", proposals: kept });
+        hub.enqueue({ by: "assistant", who: r.who, type: "suggestUpdates", patientId: r.link.patientId, assistantId: r.link.assistantId, proposals: kept });
       }
       const skipped = drafts.length - kept.length;
       return say(

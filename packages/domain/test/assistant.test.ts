@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  ASSISTANT_DEFAULT_SECTIONS, ASSISTANT_RULES, DEMO_TZ, LOCAL_ASSISTANT, assistantContext, demoAnswer, demoJournal, run,
+  ASSISTANT_DEFAULT_SECTIONS, ASSISTANT_RULES, DEMO_TZ, assistantContext, run,
   type Command, type World,
 } from "../src";
 import { NOW, ari, fill, later, who } from "./helpers";
@@ -42,7 +42,7 @@ describe("connecting an assistant", () => {
 describe("journal and drafts", () => {
   it("an unconnected assistant can't write to her journal or draft updates", () => {
     expect(() => go(fill(), { ...claude, type: "writeJournal", patientId: ari, text: "Slept badly.", assistantId: "ai-claude" })).toThrow(/isn't connected/);
-    expect(() => go(fill(), { ...claude, type: "assistantReply", patientId: ari, assistantId: "ai-claude", entryId: null, reply: "", proposals: [] })).toThrow(/isn't connected/);
+    expect(() => go(fill(), { ...claude, type: "suggestUpdates", patientId: ari, assistantId: "ai-claude", proposals: [] })).toThrow(/isn't connected/);
   });
 
   it("drafts change nothing until she applies them; invalid drafts are dropped and counted", () => {
@@ -50,7 +50,7 @@ describe("journal and drafts", () => {
     w = go(w, { ...who.patient, type: "writeJournal", patientId: ari, text: "Slept badly again and started magnesium.", assistantId: null });
     const before = w.patients.find((p) => p.id === ari)!;
     w = go(w, {
-      ...claude, type: "assistantReply", patientId: ari, assistantId: "ai-claude", entryId: "j-1", reply: "Noted. Rough night.",
+      ...claude, type: "suggestUpdates", patientId: ari, assistantId: "ai-claude",
       proposals: [
         { proposal: { kind: "checkIn", date: "2026-11-18", sleep: 2 }, why: "Slept badly again" },
         { proposal: { kind: "addMed", name: "Magnesium", detail: "Started recently" }, why: "started magnesium" },
@@ -59,9 +59,8 @@ describe("journal and drafts", () => {
       ],
     });
     expect(w.proposals.map((p) => p.status)).toEqual(["pending", "pending"]);
-    expect(w.log.at(-1)?.summary).toMatch(/drafted 2 updates.*2 invalid drafts dropped/);
+    expect(w.log.at(-1)?.summary).toMatch(/suggested 2 updates.*2 invalid suggestions dropped/);
     expect(w.patients.find((p) => p.id === ari)).toEqual(before);
-    expect(w.journal[0]?.reply).toBe("Noted. Rough night.");
 
     w = go(w, { ...who.patient, type: "applyProposal", proposalId: "d-1" });
     w = go(w, { ...who.patient, type: "dismissProposal", proposalId: "d-2" });
@@ -75,7 +74,7 @@ describe("journal and drafts", () => {
   it("merges a partial check-in into the day's existing one", () => {
     let w = connect(fill());
     w = go(w, { ...who.patient, type: "logCheckIn", patientId: ari, checkIn: { date: "2026-11-18", mood: 3, sleep: 4, energy: 3, skin: 4 } });
-    w = go(w, { ...claude, type: "assistantReply", patientId: ari, assistantId: "ai-claude", entryId: null, reply: "", proposals: [{ proposal: { kind: "checkIn", date: "2026-11-18", sleep: 1 }, why: "" }] });
+    w = go(w, { ...claude, type: "suggestUpdates", patientId: ari, assistantId: "ai-claude", proposals: [{ proposal: { kind: "checkIn", date: "2026-11-18", sleep: 1 }, why: "" }] });
     w = go(w, { ...who.patient, type: "applyProposal", proposalId: w.proposals.at(-1)!.id });
     expect(w.patients.find((x) => x.id === ari)!.checkIns.at(-1)).toEqual({ date: "2026-11-18", mood: 3, sleep: 1, energy: 3, skin: 4 });
   });
@@ -87,36 +86,12 @@ describe("journal and drafts", () => {
     expect(w.log.at(-1)?.summary).toBe("Patient wrote a journal entry through Claude");
   });
 
-  it("demo replies come only from Attune itself", () => {
-    expect(() => go(fill(), { ...claude, type: "assistantReply", patientId: ari, assistantId: LOCAL_ASSISTANT.id, entryId: null, reply: "", proposals: [] })).toThrow(/Attune itself/);
-    const w = go(fill(), { by: "agent", who: "Attune", type: "assistantReply", patientId: ari, assistantId: LOCAL_ASSISTANT.id, entryId: null, reply: "", proposals: [] });
-    expect(w.log.at(-1)?.summary).toMatch(/Demo replies/);
+  it("only a connected assistant suggests updates; Attune itself never does", () => {
+    expect(() => go(fill(), { by: "agent", who: "Attune", type: "suggestUpdates", patientId: ari, assistantId: "ai-claude", proposals: [] })).toThrow(/Only a connected assistant/);
   });
 });
 
-describe("demo replies follow the same rules", () => {
-  const DIAGNOSIS = /\b(you have|diagnos|pmos|pcos|prediabet|insulin resistan|you should take|dose|treat)\w*/i;
-
-  it("drafts today's scales and a new medication from plain words", () => {
-    const meds = fill().patients.find((p) => p.id === ari)!.meds;
-    const out = demoJournal("Slept terribly again, up at 3am. Skin broke out on my chin. Started magnesium last night.", "2026-11-18", meds);
-    expect(out.proposals.map((p) => p.proposal)).toEqual([
-      { kind: "checkIn", date: "2026-11-18", sleep: 1, skin: 2 },
-      { kind: "addMed", name: "Magnesium", detail: "Started recently" },
-    ]);
-    expect(out.reply).not.toMatch(DIAGNOSIS);
-  });
-
-  it("answers about labs with the value, date, range and source, and no interpretation", () => {
-    const w = fill();
-    const a = demoAnswer(w, ari, "What was my last A1c?", NOW, DEMO_TZ, ["results"]);
-    expect(a.answer).toContain("A1c 5.7 %");
-    expect(a.answer).toContain("outside the range the lab printed");
-    expect(a.answer).toContain("Cedar Family Medicine chart (example)");
-    expect(a.answer).not.toMatch(DIAGNOSIS);
-    expect(demoAnswer(w, ari, "What was my last A1c?", NOW, DEMO_TZ, []).answer).toMatch(/haven't shared labs/);
-  });
-
+describe("assistant rules", () => {
   it("the assistant rules forbid diagnosis and treatment advice", () => {
     expect(ASSISTANT_RULES).toMatch(/Never diagnose/);
     expect(ASSISTANT_RULES).toMatch(/never recommend or adjust treatment/);

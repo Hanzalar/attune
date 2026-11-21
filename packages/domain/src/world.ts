@@ -1,5 +1,5 @@
 /** Lookups and small immutable updates over the shared world. Refusals throw DomainError with an actionable message. */
-import { AI_ASSISTANTS, LOCAL_ASSISTANT } from "./config";
+import { AI_ASSISTANTS } from "./config";
 import type { AuditEvent, Offer, Patient, Practice, Referral, Role, SectionKey, Slot, World } from "./types";
 
 export class DomainError extends Error {
@@ -57,7 +57,7 @@ export function audit(
 
 /** A recipient's display name: a practice, or an AI assistant she connected. */
 export function nameOf(w: World, recipientId: string): string {
-  const assistant = [...AI_ASSISTANTS, LOCAL_ASSISTANT].find((a) => a.id === recipientId);
+  const assistant = AI_ASSISTANTS.find((a) => a.id === recipientId);
   return w.practices.find((p) => p.id === recipientId)?.name ?? (assistant ? `${assistant.name} (${assistant.vendor})` : recipientId);
 }
 

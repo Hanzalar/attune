@@ -1,7 +1,7 @@
 /**
- * AI assistants: connect Claude or ChatGPT the way she shares with a doctor, section by section. Claude also answers
- * inside Attune; both can reach her record through Attune's connector (MCP). The connector address carries a secret,
- * so it shows only here.
+ * AI assistants: connect Claude or ChatGPT the way she shares with a doctor, section by section. She talks to the
+ * assistant in its own app; it reaches her record through Attune's connector (MCP). The connector address carries a
+ * secret, so it shows only here.
  */
 import { useState } from "react";
 import { Copy } from "lucide-react";
@@ -10,22 +10,13 @@ import {
   type SectionKey, type World,
 } from "@attune/domain";
 import { RADIUS, SIZE, T } from "../design/tokens";
-import { connectorUrl, newToken, useGatewayStatus, type GatewayStatus } from "../shared/assistant";
+import { connectorUrl, newToken, useConnectorAvailable } from "../shared/connector";
 import { dateShort } from "../shared/format";
 import { Button, Notice, Overline, Paper, Toggle, Voice, useAct, useToast } from "../shared/ui";
 import { ME } from "./nav";
 import { Body, Screen, SectionLabel, Small } from "./Screen";
 
 type Run = ReturnType<typeof useAct>;
-
-function InAppStatus({ status }: { status: GatewayStatus | null }) {
-  if (status === null) return <Small>Checking whether Claude can answer here…</Small>;
-  return status.ready ? (
-    <Small>Claude answers inside Attune{status.model ? ` (model ${status.model})` : ""}.</Small>
-  ) : (
-    <Small>{status.reason ?? "Claude isn't available here yet."} Until then, demo replies answer, labelled as such.</Small>
-  );
-}
 
 function ConnectorBox({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
@@ -58,7 +49,7 @@ function NotConnected({ a, patient, run }: { a: AssistantInfo; patient: Patient;
   return (
     <>
       <Body style={{ marginTop: 8 }}>
-        {a.inApp ? `Journal and ask inside Attune, and use ${a.name} itself with your record.` : `Connect from ${a.name} through Attune's connector, then journal or ask there.`}
+        Talk to {a.name} in its own app. It can save what you tell it to your journal, suggest updates and answer questions about your record, through Attune's connector.
       </Body>
       <Small style={{ marginTop: 4 }}>Pick what {a.name} may read. You can change it any time.</Small>
       <div style={{ marginTop: 6 }}>
@@ -92,6 +83,14 @@ function Connected({ a, w, patient, run, since, token }: { a: AssistantInfo; w: 
           />
         ))}
       </div>
+      <div style={{ marginTop: 12 }}>
+        <Overline>Try saying to {a.name}</Overline>
+        <ul style={{ margin: "6px 0 0", paddingLeft: 18, fontSize: SIZE.body, lineHeight: 1.6, color: T.forest, listStyle: "disc" }}>
+          <li>“Log that I slept badly and my skin broke out.”</li>
+          <li>“What was my last A1c?”</li>
+          <li>“When is my visit, and what's in my Patient Pack?”</li>
+        </ul>
+      </div>
       <ConnectorBox url={connectorUrl(token)} />
       <div style={{ marginTop: 8 }}>
         <Button full variant="quiet" onClick={() => run({ ...ME, type: "disconnectAssistant", patientId: patient.id, assistantId: a.id }, `${a.name} disconnected. Its connector address no longer works.`)}>
@@ -105,18 +104,23 @@ function Connected({ a, w, patient, run, since, token }: { a: AssistantInfo; w: 
 export function Assistants({ w, patient }: { w: World; patient: Patient }) {
   const [toast, show] = useToast();
   const run = useAct(show);
-  const status = useGatewayStatus();
+  const available = useConnectorAvailable();
 
   return (
-    <Screen back="/care" overline="AI assistants" title="Bring your own AI" sub="Journal in Claude or ChatGPT and keep your record current. They read only what you switch on.">
-      <Notice>Assistants draft; you decide. Nothing they suggest changes your record until you apply it, and every read shows under “Who viewed your record”.</Notice>
+    <Screen back="/care" overline="AI assistants" title="Bring your own AI" sub="Journal and ask in Claude or ChatGPT. Attune keeps your record; they read only what you switch on.">
+      <Notice>Assistants suggest; you decide. Nothing changes your record until you apply it, and every read shows under “Who viewed your record”.</Notice>
+      {available === false && (
+        <Notice tone="attention" title="The connector isn't running here">
+          Assistants reach Attune through its connector, which runs alongside the app. This public demo doesn't run it, so connecting here won't
+          link a real assistant. To try it, run Attune locally with the connector (npm run assistant).
+        </Notice>
+      )}
       {AI_ASSISTANTS.map((a, i) => {
         const link = activeLink(w, patient.id, a.id);
         return (
           <Paper key={a.id} seed={81 + i} torn={false}>
             <Overline>{a.vendor}</Overline>
             <Voice as="h2" size={SIZE.xl} style={{ marginTop: 6 }}>{a.name}</Voice>
-            {a.inApp && <div style={{ marginTop: 6 }}><InAppStatus status={status} /></div>}
             {link ? <Connected a={a} w={w} patient={patient} run={run} since={link.connectedAt} token={link.token} /> : <NotConnected a={a} patient={patient} run={run} />}
           </Paper>
         );

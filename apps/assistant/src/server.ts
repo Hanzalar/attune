@@ -1,29 +1,28 @@
 /**
- * Attune assistant gateway. One small Node server:
- *   /api/assistant/*  in-app Claude for the journal and Ask screens (local app only)
- *   /api/hub/*        record sync between the app and connected assistants (local app only)
- *   /mcp/<token>      the MCP connector for Claude, ChatGPT or any MCP client (token required)
- * App endpoints answer only requests addressed to localhost, so exposing the server through a tunnel for a remote
- * assistant exposes the token-guarded connector and nothing else. Prototype: synthetic data only (ADR-007).
+ * Attune connector gateway. One small Node server:
+ *   /mcp/<token>  the MCP connector for Claude, ChatGPT or any MCP client she connects (token required)
+ *   /api/hub/*    record sync between the app and connected assistants (local app only)
+ * The conversation happens in her assistant's own app; this server never calls a model. App endpoints answer only
+ * requests addressed to localhost, so exposing the server through a tunnel exposes the token-guarded connector and
+ * nothing else. Prototype: synthetic data only (ADR-007).
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 import type { World } from "@attune/domain";
-import { GatewayError, askRecord, claudeHealth, explain, journalReply } from "./claude";
 import { hub } from "./hub";
 import { connectorServer, resolveToken } from "./mcp";
+
+class GatewayError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+  }
+}
 
 const PORT = Number(process.env.PORT ?? 8787);
 const HOST = process.env.HOST ?? "127.0.0.1";
 const LIMIT = 4_000_000;
 
-const JournalIn = z.object({ context: z.string().max(200_000), entry: z.string().min(1).max(4000), today: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) });
-const AskIn = z.object({
-  context: z.string().max(200_000),
-  question: z.string().min(1).max(2000),
-  history: z.array(z.object({ role: z.enum(["user", "assistant"]), text: z.string().max(8000) })).max(40),
-});
 const AckIn = z.object({ results: z.array(z.object({ id: z.string(), error: z.string().nullable() })) });
 
 async function body(req: IncomingMessage): Promise<unknown> {
@@ -81,16 +80,6 @@ async function route(req: IncomingMessage, res: ServerResponse) {
 
   const key = `${req.method} ${path}`;
   switch (key) {
-    case "GET /api/assistant/health":
-      return send(res, 200, await claudeHealth());
-    case "POST /api/assistant/journal": {
-      const b = parse(JournalIn, await body(req));
-      return send(res, 200, await journalReply(b.context, b.entry, b.today));
-    }
-    case "POST /api/assistant/ask": {
-      const b = parse(AskIn, await body(req));
-      return send(res, 200, { answer: await askRecord(b.context, b.question, b.history) });
-    }
     case "PUT /api/hub/world": {
       const w = (await body(req)) as World | undefined;
       if (!w || w.schema !== 4) throw new GatewayError(400, "Unsupported record format.");
@@ -109,10 +98,10 @@ async function route(req: IncomingMessage, res: ServerResponse) {
 
 createServer((req, res) => {
   route(req, res).catch((err: unknown) => {
-    const e = explain(err);
+    const e = err instanceof GatewayError ? err : new GatewayError(500, "The connector gateway hit an unexpected error.");
     if (e.status >= 500) console.error("[gateway]", err);
     if (!res.headersSent) send(res, e.status, { error: e.message });
   });
 }).listen(PORT, HOST, () => {
-  console.log(`Attune assistant gateway on http://${HOST}:${PORT} (connector: /mcp/<token>)`);
+  console.log(`Attune connector gateway on http://${HOST}:${PORT} (connector: /mcp/<token>)`);
 });

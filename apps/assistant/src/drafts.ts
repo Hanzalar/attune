@@ -1,11 +1,11 @@
 /**
- * The shape assistants use to draft record updates, shared by the in-app Claude call (structured output) and the
- * MCP connector (tool input). Every draft still passes the domain's own checks before she sees it.
+ * The shape assistants use to draft record updates through the connector's suggest_record_updates tool. Every draft
+ * still passes the domain's own checks before she sees it.
  */
 import { z } from "zod";
 import type { Proposal, Score } from "@attune/domain";
 
-/** Flat, all-fields-present shape: structured outputs work best without optional keys or unions. */
+/** Flat, all-fields-present shape: simple for any assistant to fill in, with no unions to get wrong. */
 export const Draft = z.object({
   kind: z.enum(["checkIn", "addMed", "stopMed", "storyNote"]).describe("checkIn: today's 1-5 scales; addMed/stopMed: a medication she said she started or stopped; storyNote: something she wants in her story"),
   why: z.string().describe("Her exact words this draft comes from"),

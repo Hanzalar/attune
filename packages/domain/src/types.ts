@@ -319,14 +319,11 @@ export interface JournalEntry {
   patientId: string;
   at: string;
   text: string;
-  /** Who wrote it: her, in the app, or an assistant on her behalf (e.g. she journaled in Claude). */
+  /** Who wrote it: her, in the app, or an assistant on her behalf (she journaled in Claude or ChatGPT). */
   source: "patient" | string;
-  /** The assistant's short acknowledgement, if any. Never advice. */
-  reply: string | null;
-  replyBy: string | null;
 }
 
-/** A change an assistant drafted from her journal. Nothing changes her record until she applies it. */
+/** A change an assistant suggested from what she told it. Nothing changes her record until she applies it. */
 export type Proposal =
   | { kind: "checkIn"; date: string; mood?: Score; sleep?: Score; energy?: Score; skin?: Score }
   | { kind: "addMed"; name: string; detail: string }
@@ -336,11 +333,10 @@ export type Proposal =
 export interface ProposalRecord {
   id: string;
   patientId: string;
-  entryId: string | null;
   by: string;
   at: string;
   proposal: Proposal;
-  /** The words in her entry it came from. */
+  /** Her words it came from. */
   why: string;
   status: "pending" | "applied" | "dismissed";
   decidedAt: string | null;

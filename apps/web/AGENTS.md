@@ -1,6 +1,6 @@
 <!-- CONSTITUTION:START -->
 Generated from https://github.com/Hanzalar/attune/tree/meta/governance.
-Source SHA-256: `0417ada0d96d6d34a9e4839a11d57fba5163667b0e1e7e2917eb6bfe0b9fa036`.
+Source SHA-256: `577080a22b334891250cb0a4e270f75e025ef1c785bc9454d2ab767b06217d1c`.
 Edit canonical sources in specs repo; regenerate this managed block.
 
 # Component: web (Patient app, PCP portal, specialist portal, ops and demo hub over one shared record)
@@ -13,4 +13,5 @@ Read the root AGENTS.md and relevant specifications first.
 - Patient app is mobile-first: text 14px or larger, no red dots or badges, no infinite scroll, no horizontal scroll at 390px, tap targets at least 44px.
 - Clinician portals stay usable at phone width even though they are designed for desktop.
 - Keep files under 400 lines; split by screen or panel.
+- No in-app chatbot: the patient app shows connections, suggestions waiting for her, and who read what.
 <!-- CONSTITUTION:END -->

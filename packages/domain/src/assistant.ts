@@ -1,9 +1,9 @@
 /**
  * AI assistants (Claude, ChatGPT) as consent recipients. She connects one and picks sections; it reads only those,
- * every read is logged, and anything it writes is a draft she applies or dismisses. The record text an assistant
- * sees is built here, so the in-app journal, the Ask screen and the MCP connector all see exactly the same thing.
+ * every read is logged, and anything it writes is a draft she applies or dismisses. She talks to the assistant in its
+ * own app; it reaches her record only through Attune's connector, which serves the text built here.
  */
-import { AI_ASSISTANTS, JOURNAL_CONTEXT_ENTRIES, LOCAL_ASSISTANT, PRODUCT_NAME, type AssistantInfo } from "./config";
+import { AI_ASSISTANTS, JOURNAL_CONTEXT_ENTRIES, PRODUCT_NAME, type AssistantInfo } from "./config";
 import { canSee, grant, revoke } from "./consent";
 import { MODE, REFERRAL_STATUS, SECTION, SPECIALTY } from "./labels";
 import { localParts } from "./time";
@@ -12,7 +12,7 @@ import type { CheckIn, Proposal, ProposalRecord, Role, Score, SectionKey, World 
 import { DomainError, need, patientOf, withPatient } from "./world";
 
 export function assistantInfo(id: string): AssistantInfo | undefined {
-  return id === LOCAL_ASSISTANT.id ? LOCAL_ASSISTANT : AI_ASSISTANTS.find((a) => a.id === id);
+  return AI_ASSISTANTS.find((a) => a.id === id);
 }
 
 export function activeLink(w: World, patientId: string, assistantId: string) {
@@ -26,8 +26,7 @@ export function linkByToken(w: World, token: string) {
 /** The record as an assistant may see it right now: only granted sections, every fact with its source. */
 export function assistantContext(w: World, patientId: string, assistantId: string, now: string, timeZone: string): { sections: SectionKey[]; text: string } {
   const p = patientOf(w, patientId);
-  const local = assistantId === LOCAL_ASSISTANT.id;
-  const has = (s: SectionKey) => local || canSee(w, patientId, assistantId, s);
+  const has = (s: SectionKey) => canSee(w, patientId, assistantId, s);
   const today = localParts(now, timeZone).date;
   const lines: string[] = [`${PRODUCT_NAME} record for ${p.firstName} (synthetic demo data). Today is ${today}.`];
   const sections: SectionKey[] = [];
@@ -69,7 +68,7 @@ export function assistantContext(w: World, patientId: string, assistantId: strin
 
 const isScore = (v: unknown): v is Score => typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= 5;
 
-/** Why a drafted change can't be kept, or null when it's fine. LLM output is checked like any other input. */
+/** Why a suggested change can't be kept, or null when it's fine. Assistant output is checked like any other input. */
 export function proposalProblem(p: Proposal, meds: { name: string }[]): string | null {
   switch (p.kind) {
     case "checkIn": {
@@ -107,17 +106,13 @@ export type AssistantBody =
   | { type: "connectAssistant"; patientId: string; assistantId: string; sections: SectionKey[]; token: string }
   | { type: "disconnectAssistant"; patientId: string; assistantId: string }
   | { type: "writeJournal"; patientId: string; text: string; assistantId: string | null }
-  | { type: "assistantReply"; patientId: string; assistantId: string; entryId: string | null; reply: string; proposals: { proposal: Proposal; why: string }[] }
+  | { type: "suggestUpdates"; patientId: string; assistantId: string; proposals: { proposal: Proposal; why: string }[] }
   | { type: "applyProposal"; proposalId: string }
   | { type: "dismissProposal"; proposalId: string };
 
 type Log = (next: World, summary: string, patientId: string | null, shared?: { recipientId: string; sections: SectionKey[] }) => World;
 
 function requireLink(w: World, patientId: string, assistantId: string, by: Role) {
-  if (assistantId === LOCAL_ASSISTANT.id) {
-    need(by === "agent", "Demo replies come from Attune itself.");
-    return;
-  }
   need(by === "assistant", "Only a connected assistant can do this.");
   need(activeLink(w, patientId, assistantId), `${assistantInfo(assistantId)?.name ?? "That assistant"} isn't connected. She can connect it under Care team.`);
 }
@@ -178,23 +173,23 @@ export function applyAssistantCommand(w: World, c: AssistantBody & { by: Role; w
       need(text.length <= 4000, "That entry is too long for one note. Split it in two.");
       if (c.assistantId) requireLink(w, c.patientId, c.assistantId, c.by);
       else need(c.by === "patient", "Only she writes in her own journal.");
-      const entry = { id: `j-${w.journal.length + 1}`, patientId: c.patientId, at: now, text, source: c.assistantId ?? "patient", reply: null, replyBy: null };
+      const entry = { id: `j-${w.journal.length + 1}`, patientId: c.patientId, at: now, text, source: c.assistantId ?? "patient" };
       const from = c.assistantId ? ` through ${assistantInfo(c.assistantId)?.name}` : "";
       return log({ ...w, journal: [...w.journal, entry] }, `Patient wrote a journal entry${from}`, c.patientId);
     }
-    case "assistantReply": {
+    case "suggestUpdates": {
       requireLink(w, c.patientId, c.assistantId, c.by);
       const p = patientOf(w, c.patientId);
       const kept = c.proposals.filter((x) => proposalProblem(x.proposal, p.meds) === null);
       const dropped = c.proposals.length - kept.length;
+      need(kept.length > 0 || dropped > 0, "Suggest at least one update.");
       const records: ProposalRecord[] = kept.map((x, i) => ({
-        id: `d-${w.proposals.length + i + 1}`, patientId: c.patientId, entryId: c.entryId, by: c.assistantId, at: now,
+        id: `d-${w.proposals.length + i + 1}`, patientId: c.patientId, by: c.assistantId, at: now,
         proposal: x.proposal, why: x.why.slice(0, 280), status: "pending", decidedAt: null,
       }));
-      const journal = c.entryId ? w.journal.map((j) => (j.id === c.entryId ? { ...j, reply: c.reply.trim().slice(0, 600) || null, replyBy: c.assistantId } : j)) : w.journal;
       const name = assistantInfo(c.assistantId)?.name;
-      return log({ ...w, journal, proposals: [...w.proposals, ...records] },
-        `${name} drafted ${records.length} update${records.length === 1 ? "" : "s"} for her to review${dropped ? `; ${dropped} invalid draft${dropped === 1 ? "" : "s"} dropped` : ""}`, c.patientId);
+      return log({ ...w, proposals: [...w.proposals, ...records] },
+        `${name} suggested ${records.length} update${records.length === 1 ? "" : "s"} for her to review${dropped ? `; ${dropped} invalid suggestion${dropped === 1 ? "" : "s"} dropped` : ""}`, c.patientId);
     }
     case "applyProposal":
     case "dismissProposal": {

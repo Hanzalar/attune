@@ -309,7 +309,7 @@ function apply(w: World, c: Command, now: string): World {
     case "connectAssistant":
     case "disconnectAssistant":
     case "writeJournal":
-    case "assistantReply":
+    case "suggestUpdates":
     case "applyProposal":
     case "dismissProposal":
       return applyAssistantCommand(w, c, now, log);

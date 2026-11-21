@@ -95,12 +95,12 @@ export function resetWorld(mode: "fresh" | "fill") {
 let ticking = false;
 
 /**
- * Sync with the assistant gateway's hub, when one is running: push the record so a connected assistant can read
+ * Sync with the connector gateway's hub, when one is running: push the record so a connected assistant can read
  * what she shared, and pull what assistants sent through the MCP connector (journal entries, drafts). Pulled items
  * run through act(), so the domain checks the connection and consent like any other command. Without a gateway
  * (the public demo) this backs off quietly.
  */
-const HUB = `${import.meta.env.VITE_ASSISTANT_URL ?? ""}/api/hub`;
+const HUB = `${import.meta.env.VITE_GATEWAY_URL ?? ""}/api/hub`;
 let pushed: World | null = null;
 let hubRetryAt = 0;
 let hubBusy = false;

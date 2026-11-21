@@ -65,21 +65,17 @@ export interface AssistantInfo {
   id: string;
   name: string;
   vendor: string;
-  /** Powers the journal and Ask screens inside Attune (through Attune's gateway). */
-  inApp: boolean;
 }
 
 /**
- * Assistants she can connect. Each is a consent recipient like a practice. Every one can connect through Attune's
- * MCP connector; Claude also powers the in-app journal and Ask screens.
+ * Assistants she can connect. The conversation happens in the assistant she already uses; Attune is the record
+ * behind it, reached through Attune's MCP connector. Each assistant is a consent recipient like a practice. Any
+ * other MCP client can use the same connector.
  */
 export const AI_ASSISTANTS: readonly AssistantInfo[] = [
-  { id: "ai-claude", name: "Claude", vendor: "Anthropic", inApp: true },
-  { id: "ai-chatgpt", name: "ChatGPT", vendor: "OpenAI", inApp: false },
+  { id: "ai-claude", name: "Claude", vendor: "Anthropic" },
+  { id: "ai-chatgpt", name: "ChatGPT", vendor: "OpenAI" },
 ];
-
-/** The offline stand-in used when no model is reachable. It runs in the browser, so nothing leaves her device. */
-export const LOCAL_ASSISTANT: AssistantInfo = { id: "attune-local", name: "Demo replies (no AI model)", vendor: "Attune", inApp: true };
 
 /** What an assistant can be granted, and the default grant. Insurance stays off unless she turns it on. */
 export const ASSISTANT_SECTIONS: readonly SectionKey[] = ["story", "trends", "results", "meds", "care", "summaries", "journal", "insurance"];
@@ -89,12 +85,11 @@ export const ASSISTANT_DEFAULT_SECTIONS: readonly SectionKey[] = ["story", "tren
 export const JOURNAL_CONTEXT_ENTRIES = 10;
 
 /**
- * Rules every assistant works under, in-app or through the connector. The gateway sends them as the system prompt;
- * the MCP server returns them with every record read.
+ * Rules every assistant works under. The connector returns them with every record read, ahead of the record itself.
  */
-export const ASSISTANT_RULES = `You help one patient with her own health record in ${PRODUCT_NAME}. Her record is below, limited to the sections she chose to share.
+export const ASSISTANT_RULES = `You are helping one patient with her own health record in ${PRODUCT_NAME}, through ${PRODUCT_NAME}'s connector. Her record is below, limited to the sections she chose to share with you.
 - Answer only from her record. Name the source and date of every fact you use. If something isn't in what she shared, say so plainly.
 - Never diagnose, never say what a result or symptom means for her health, never estimate risk, and never recommend or adjust treatment, supplements or doses. You may say whether a value is inside or outside the range the lab printed, and nothing more about it.
-- When she asks what something means or what to do, offer to add a question for her care team, and suggest she ask them.
-- When she journals, reply in one or two warm, plain sentences that acknowledge what she wrote. Draft record updates only for things she clearly said: check-in scores for today (1 is the low end, 5 the high end), medications she started or stopped, and notes for her story. Never infer a condition.
-- Keep answers short. No headings. No emoji.`;
+- When she asks what something means or what to do, suggest she ask her care team, and offer to note the question in her journal.
+- When she asks you to journal or log something, save her words with write_journal_entry. Then suggest record updates with suggest_record_updates, only for things she clearly said: check-in scores for today (1 is the low end, 5 the high end), medications she started or stopped, and notes for her story. Never infer a condition. Tell her the updates wait for her approval in ${PRODUCT_NAME}.
+- Keep answers short. No emoji.`;
