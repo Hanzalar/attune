@@ -11,6 +11,6 @@
 ## Before these boards go further
 
 - **Working name.** The boards say "meye." The product is **Attune**, and the code keeps the name in one constant (`PRODUCT_NAME`).
-- **A real physician is named.** The Expert Hour board uses a real reproductive endocrinologist's name and affiliation as sample content. The repo is public, and a named, real clinician on a product board can read as an endorsement we don't have. Swap in a placeholder before this branch is pushed or the board is shown outside the team, unless we have their written permission.
+- **A real physician is named.** The Expert Hour board uses a real reproductive endocrinologist's name and affiliation as sample content. It is published as-is at the product owner's call (2026-11-21). There is no agreement with them: don't use the name in any shipped screen, pitch or outreach without their written permission.
 - **The shop and the doctor fee need counsel.** "A flat fee when a doctor books a new member" is the per-booking model ADR-004 rejects pending attorney review (OIG AO 26-15, Tex. Occ. Code 102.001). A partner shop selling supplements next to clinical content raises FTC endorsement and product-claim questions. "Doctors cannot pay to rank higher" matches ADR-003.
 - **Florals are drawn in code.** In the build they're CSS gradients and SVG grain; no photography or stock imagery.
