@@ -9,6 +9,13 @@ Most of the model rests on one PCP practice, one MA, one specialist MA and a han
 - [ ] Does the agent ever recommend an endo first, or always gyno first, then endo or REI by rule?
 - [ ] Who owns HIPAA, BAA and FDA questions?
 
+- [ ] Cancellation fill (from [prototype-landscape-2026-11.md](research/prototype-landscape-2026-11.md)): should the 24h+ tiers fall back to 2 offers at once after a few single offers go unanswered? Published per-offer acceptance is 8–11%.
+- [ ] Quiet hours: should new holds wait between 9 PM and 7 AM her time? Offers sent at night expire unseen.
+- [ ] Equity: patients 65+ and non-English speakers accept fewer offers. Do we need longer holds or translated texts before a pilot?
+- [ ] Navigation: Home plus two header icons (Record, Care team), or a small tab bar? (Open item from the handoff, for design.)
+- [ ] "Muse" was named as an assistant to support. Which product is it, and does it support MCP connectors?
+- [ ] Midi Health added a PMOS pathway (Aug 2026). Fallback destination, like Allara, or a competitor for the gyn visit?
+
 ## For PCP MAs and office managers
 - [ ] Would you trust a packet you didn't assemble? What would you check before signing?
 - [ ] How long does one referral take today, from start to fax confirmation?
@@ -30,6 +37,9 @@ Most of the model rests on one PCP practice, one MA, one specialist MA and a han
 - [ ] When you refer a PMOS patient to an endo or REI, what do you send and what comes back?
 
 ## For patients
+- [ ] Would you journal in a few words a day if an AI turned it into your check-in and record updates you approve? (ADR-012)
+- [ ] Which AI assistant do you already use (Claude, ChatGPT, another)? Would you connect it to your health record, and which parts would you keep back?
+- [ ] What would you ask about your own labs and visits, and what answer would feel like too much?
 - [ ] Would you let an app pull your portal records and labs to build a referral? What would stop you?
 - [ ] Did you ever skip or lose a referral? Why (insurance, wait, no call back)?
 - [ ] Would you pay for an agent that gets you seen sooner? How much, once or monthly?
@@ -38,5 +48,6 @@ Most of the model rests on one PCP practice, one MA, one specialist MA and a han
 ## For advisors
 - [ ] Attorney: can any specialist-paid model work under AO 26-15 and Texas 102.001? What structure is safest?
 - [ ] Advisor (ex-Epic): is a SMART on FHIR read app realistic for small practices? Cheapest path to write-back? Is 360X live at DFW Epic sites?
-- [ ] Regulatory: does mapping data to Rotterdam criteria count as clinical decision support that needs FDA clearance?
+- [ ] Regulatory: does mapping data to Rotterdam criteria count as clinical decision support that needs FDA clearance? (Moot for the prototype: ADR-009 removed the mapping. Ask again before it comes back.)
+- [ ] Attorney: is a per-referral fee paid by the specialist practice, triggered on an attended visit, ever permissible? (ADR-010; the prototype only shows a ledger.)
 - [ ] Clinical: confirm the mFG threshold (we use 6, per the 2023 guideline's 4 to 6 range) and the symptom-code approach.
