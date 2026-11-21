@@ -45,6 +45,8 @@ jobs:
           cp .landing/index.html "$dist/index.html"
           cp -R .landing/site "$dist/site"
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: apps/web/dist
