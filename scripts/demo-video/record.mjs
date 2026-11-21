@@ -152,7 +152,8 @@ for (const film of films) {
   console.log(`${film.slug}: ${out.seconds.toFixed(1)} s, ${frames.length} frames → ${out.mp4}`);
 }
 
-await send("Page.stopScreencast");
+// Chrome sometimes never answers this during shutdown; don't let it hold the run open.
+await Promise.race([send("Page.stopScreencast"), sleep(3000)]);
 console.log(problems.length ? `problems:\n- ${problems.join("\n- ")}` : "problems: none");
 ws.close();
 chrome.kill();
